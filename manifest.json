@@ -1,0 +1,9 @@
+{
+  "name": "Transformation Tracker",
+  "short_name": "Tracker",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f7f8",
+  "theme_color": "#087E8B",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#087E8B">
+<link rel="manifest" href="manifest.json">
+<title>Transformation Tracker</title>
+<style>
+:root{--bg:#f6f7f8;--card:#fff;--ink:#1d2327;--mute:#66707a;--line:#e3e6e9;--acc:#087E8B;--acc2:#e7f3f4;--good:#2e7d32;--warn:#b26a00;--bad:#c62828;--r:14px}
+@media (prefers-color-scheme:dark){:root{--bg:#121416;--card:#1c1f22;--ink:#e8eaec;--mute:#9aa3ab;--line:#2c3135;--acc:#3fb5c1;--acc2:#16343a;--good:#66bb6a;--warn:#ffb74d;--bad:#ef5350}}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:84px}
+header{position:sticky;top:0;z-index:5;background:var(--acc);color:#fff;padding:12px 16px calc(12px) 16px}
+header h1{margin:0;font-size:17px;font-weight:650}
+header .sub{font-size:12.5px;opacity:.9}
+main{max-width:720px;margin:0 auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.card h2{margin:0 0 10px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.kpi{background:var(--acc2);border-radius:10px;padding:10px}
+.kpi .v{font-size:20px;font-weight:700}
+.kpi .l{font-size:12px;color:var(--mute)}
+label{display:block;font-size:12.5px;color:var(--mute);margin-bottom:3px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
+textarea{min-height:56px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.chk{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);font-size:14px;color:var(--ink)}
+.chk input{width:20px;height:20px;margin:0}
+button{font:inherit;border:0;border-radius:10px;padding:10px 14px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+button.small{padding:6px 10px;font-size:13px}
+button.danger{background:transparent;color:var(--bad);border:1px solid var(--bad)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav button{flex:1;background:none;color:var(--mute);border-radius:0;padding:12px 4px;font-size:13px;font-weight:600}
+nav button.on{color:var(--acc)}
+.tab{display:none}.tab.on{display:block}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600;background:var(--acc2);color:var(--acc)}
+.advice{border-left:4px solid var(--acc);padding:8px 10px;background:var(--acc2);border-radius:8px;margin:6px 0;font-size:14px}
+.advice.warn{border-color:var(--warn)}.advice.good{border-color:var(--good)}.advice.bad{border-color:var(--bad)}
+.mute{color:var(--mute);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:6px 5px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--mute);font-weight:600}
+.scroll{overflow-x:auto}
+.ok{color:var(--good);font-weight:700}.no{color:var(--bad);font-weight:700}
+svg text{fill:var(--mute);font-size:10px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+ul.plain{margin:6px 0 0;padding-left:18px}
+</style>
+</head>
+<body>
+<header>
+  <h1>6-Month Transformation Tracker</h1>
+  <div class="sub" id="hdr">—</div>
+</header>
+<main>
+
+<!-- TODAY -->
+<section class="tab on" id="t-today">
+  <div class="card">
+    <h2>Today <span class="pill" id="todayPhase"></span></h2>
+    <div id="todayPlan" class="mute"></div>
+  </div>
+  <div class="card">
+    <h2>Log a day</h2>
+    <div class="row">
+      <div><label>Date</label><input type="date" id="f-date"></div>
+      <div><label>Session</label><select id="f-session"></select></div>
+    </div>
+    <div class="row">
+      <label class="chk"><input type="checkbox" id="f-done"> Session done</label>
+      <label class="chk"><input type="checkbox" id="f-core"> Core done</label>
+    </div>
+    <div class="row3">
+      <div><label>Weight (kg)</label><input type="number" inputmode="decimal" step="0.1" id="f-weight" placeholder="71.8"></div>
+      <div><label>Steps</label><input type="number" inputmode="numeric" id="f-steps" placeholder="8000"></div>
+      <div><label>Sleep (h)</label><input type="number" inputmode="decimal" step="0.25" id="f-sleep" placeholder="7.5"></div>
+    </div>
+    <div class="row3">
+      <div><label>Protein (g)</label><input type="number" inputmode="numeric" id="f-protein" placeholder="123"></div>
+      <div><label>Calories</label><input type="number" inputmode="numeric" id="f-kcal" placeholder="2050"></div>
+      <div><label>Cardio (min)</label><input type="number" inputmode="numeric" id="f-cardio" placeholder="15"></div>
+    </div>
+    <div class="row">
+      <div><label>Waist at navel (in) <span id="waistDue"></span></label><input type="number" inputmode="decimal" step="0.1" id="f-waist" placeholder="every 2 weeks"></div>
+      <label class="chk" style="align-self:end"><input type="checkbox" id="f-whey"> Whey taken</label>
+    </div>
+    <div style="margin-bottom:10px"><label>Notes (energy, pain, eating out…)</label><textarea id="f-notes"></textarea></div>
+    <div class="btns"><button id="save">Save day</button><button class="ghost" id="clear">Clear form</button></div>
+  </div>
+</section>
+
+<!-- PROGRESS -->
+<section class="tab" id="t-progress">
+  <div class="card">
+    <h2>This week</h2>
+    <div class="grid" id="kpis"></div>
+  </div>
+  <div class="card">
+    <h2>What to do now</h2>
+    <div id="advice"></div>
+    <p class="mute">Uses the plan's decision rules on 7-day weight averages (weeks with 3+ weigh-ins) and your waist readings.</p>
+  </div>
+  <div class="card">
+    <h2>Weight (kg)</h2>
+    <div id="wChart"></div>
+    <div class="mute">Dots = daily weigh-ins · line = 7-day average · band = 65–67 kg target</div>
+  </div>
+  <div class="card">
+    <h2>Waist (in)</h2>
+    <div id="waistChart"></div>
+  </div>
+  <div class="card">
+    <h2>Weekly summary</h2>
+    <div class="scroll"><table id="weekTbl"></table></div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section class="tab" id="t-history">
+  <div class="card">
+    <h2>All days</h2>
+    <div class="mute" style="margin-bottom:8px">Tap a row to edit it.</div>
+    <div class="scroll"><table id="histTbl"></table></div>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section class="tab" id="t-settings">
+  <div class="card">
+    <h2>Plan settings</h2>
+    <div class="row">
+      <div><label>Week 1 start (a Monday)</label><input type="date" id="s-start"></div>
+      <div><label>Starting weight (kg)</label><input type="number" step="0.1" id="s-w0"></div>
+    </div>
+    <div class="row">
+      <div><label>Starting waist (in)</label><input type="number" step="0.1" id="s-waist0"></div>
+      <div><label>Protein target (g)</label><input type="number" id="s-protein"></div>
+    </div>
+    <div class="row">
+      <div><label>Calories low</label><input type="number" id="s-klo"></div>
+      <div><label>Calories high</label><input type="number" id="s-khi"></div>
+    </div>
+    <button id="saveSettings">Save settings</button>
+  </div>
+
+  <div class="card">
+    <h2>GitHub sync (optional)</h2>
+    <p class="mute">Saves your log as <code>data.json</code> in a <b>private</b> repo, so it's backed up and shared between your phone and PC. Use a fine-grained token limited to that one repo with “Contents: Read and write”. The token is stored only in this browser.</p>
+    <div class="row">
+      <div><label>Owner</label><input id="g-owner" placeholder="srraju08"></div>
+      <div><label>Private data repo</label><input id="g-repo" placeholder="fitness-data"></div>
+    </div>
+    <div style="margin-bottom:10px"><label>Token</label><input id="g-token" type="password" placeholder="github_pat_…"></div>
+    <label class="chk" style="margin-bottom:10px"><input type="checkbox" id="g-auto"> Push automatically after every save</label>
+    <div class="btns">
+      <button id="g-save">Save sync settings</button>
+      <button class="ghost" id="g-pull">Pull from GitHub</button>
+      <button class="ghost" id="g-push">Push to GitHub</button>
+    </div>
+    <div class="mute" id="g-status" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Backup</h2>
+    <div class="btns">
+      <button class="ghost" id="expJson">Export JSON</button>
+      <button class="ghost" id="expCsv">Export CSV</button>
+      <button class="ghost" id="impBtn">Import JSON</button>
+      <input type="file" id="impFile" accept="application/json" hidden>
+    </div>
+    <p class="mute">Without GitHub sync, data lives only in this browser. Clearing browser data deletes it, so export weekly.</p>
+    <button class="danger small" id="wipe">Delete all data on this device</button>
+  </div>
+</section>
+</main>
+
+<nav>
+  <button data-t="today" class="on">Today</button>
+  <button data-t="progress">Progress</button>
+  <button data-t="history">History</button>
+  <button data-t="settings">Settings</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ---------- plan constants ---------- */
+const SESSIONS=["Push A","Pull A","Legs A","Recovery","Upper B","Lower B","Rest"];
+const LIFT=new Set(["Push A","Pull A","Legs A","Upper B","Lower B"]);
+const BY_DAY={1:"Push A",2:"Pull A",3:"Legs A",4:"Recovery",5:"Upper B",6:"Lower B",0:"Rest"};
+const CORE_DAY={1:"Core A: plank, dead bug",2:"Core B: cable crunch, reverse crunch",5:"Core C: Pallof press, side plank",6:"Core D: reverse crunch, bird dog, plank"};
+const CARDIO={"Push A":"15 min incline walk","Pull A":"15 min cycling","Legs A":"15 min easy cycling","Recovery":"25 min easy walk + 15 min mobility","Upper B":"15 min elliptical or treadmill","Lower B":"15 min easy cycling or walk","Rest":"Optional gentle walk"};
+function phase(w){
+  if(w<1)return{n:"Not started",t:"Plan starts on your week-1 date."};
+  if(w<=4)return{n:"Foundation",t:"Weeks 1–4 sets. Keep 3 reps in reserve; technique first."};
+  if(w<=7)return{n:"Development",t:"Week 5+ sets. Add reps before load; 2–3 reps in reserve."};
+  if(w===8||w===16||w===24)return{n:"Deload",t:"Cut working sets by 40–50%. Easy effort, recover."};
+  if(w<=15)return{n:"Strength",t:"Week 5+ sets. First exercise: 8–10 reps, heavier; 1–2 reps in reserve."};
+  if(w<=23)return{n:"Refinement",t:"Week 5+ sets. First two exercises: 8–10 reps. Hold or beat week-15 loads."};
+  if(w<=26)return{n:"Review",t:"Retest lifts at a fixed load, full measurements, plan the next block."};
+  return{n:"Complete",t:"26 weeks done. Review and set the next 6 months."};
+}
+function cardioMin(w){return w<=4?"15":w<=9?"15–20":w<=17?"20":"20–25"}
+function stepTarget(w){return w<=4?7000:8000}
+
+/* ---------- storage ---------- */
+const KEY="tt-data-v1",GKEY="tt-gh-v1";
+const DEF={settings:{start:"",w0:71.8,waist0:38,protein:120,klo:1950,khi:2100},entries:{}};
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function store(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){toast("Couldn't save in this browser");return false}}
+let DB=load(KEY,null)||structuredClone(DEF);
+DB.settings=Object.assign({},DEF.settings,DB.settings||{});DB.entries=DB.entries||{};
+if(!DB.settings.start)DB.settings.start=nextMonday();
+let GH=load(GKEY,{owner:"",repo:"",token:"",auto:false,sha:""});
+
+/* ---------- date helpers ---------- */
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function parse(s){const[a,b,c]=s.split("-").map(Number);return new Date(a,b-1,c)}
+function today(){return iso(new Date())}
+function nextMonday(){const d=new Date();const k=(8-d.getDay())%7;d.setDate(d.getDate()+(d.getDay()===1?0:k));return iso(d)}
+function weekOf(s){return Math.floor((parse(s)-parse(DB.settings.start))/864e5/7)+1}
+function addDays(s,n){const d=parse(s);d.setDate(d.getDate()+n);return iso(d)}
+function fmt(s){return parse(s).toLocaleDateString("en-IN",{day:"numeric",month:"short"})}
+const $=id=>document.getElementById(id);
+const num=v=>v===""||v==null||isNaN(+v)?null:+v;
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+const r1=v=>v==null?"–":(Math.round(v*10)/10).toString();
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+
+/* ---------- navigation ---------- */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.id==="t-"+b.dataset.t));
+  render();window.scrollTo(0,0);
+});
+
+/* ---------- form ---------- */
+$("f-session").innerHTML=SESSIONS.map(s=>`<option>${s}</option>`).join("");
+function fillForm(date){
+  const e=DB.entries[date]||{};
+  $("f-date").value=date;
+  $("f-session").value=e.session||BY_DAY[parse(date).getDay()];
+  $("f-done").checked=!!e.done;$("f-core").checked=!!e.core;$("f-whey").checked=!!e.whey;
+  for(const k of["weight","steps","sleep","protein","kcal","cardio","waist"])$("f-"+k).value=e[k]??"";
+  $("f-notes").value=e.notes||"";
+  planFor(date);
+}
+$("f-date").onchange=()=>fillForm($("f-date").value);
+$("clear").onclick=()=>fillForm(today());
+$("save").onclick=()=>{
+  const d=$("f-date").value;if(!d)return toast("Pick a date");
+  const e={session:$("f-session").value,done:$("f-done").checked,core:$("f-core").checked,whey:$("f-whey").checked,notes:$("f-notes").value.trim(),updated:Date.now()};
+  for(const k of["weight","steps","sleep","protein","kcal","cardio","waist"])e[k]=num($("f-"+k).value);
+  if(e.weight!=null&&(e.weight<30||e.weight>200))return toast("Check the weight value");
+  if(e.waist!=null&&(e.waist<20||e.waist>70))return toast("Waist is in inches");
+  DB.entries[d]=e;
+  if(store(KEY,DB)){toast("Saved "+fmt(d));render();if(GH.auto&&GH.token)ghPush(true)}
+};
+function lastWaist(){const ds=Object.keys(DB.entries).filter(d=>DB.entries[d].waist!=null).sort();return ds.length?ds[ds.length-1]:null}
+function planFor(date){
+  const w=weekOf(date),p=phase(w),dow=parse(date).getDay(),s=BY_DAY[dow];
+  $("todayPhase").textContent=w>=1?`Week ${w} · ${p.n}`:p.n;
+  const core=CORE_DAY[dow];
+  $("todayPlan").innerHTML=`<b>${fmt(date)}: ${s}</b>${core?" + "+core:""}<br>${LIFT.has(s)?"Cardio: "+cardioMin(w)+" min · ":""}${CARDIO[s]}<br>${p.t}<br>Targets: ${DB.settings.protein}+ g protein · ${DB.settings.klo}–${DB.settings.khi} kcal · ${stepTarget(w).toLocaleString()}+ steps · 7+ h sleep`;
+  const lw=lastWaist();const due=!lw||(parse(date)-parse(lw))/864e5>=13;
+  $("waistDue").innerHTML=due?'<span class="pill">due</span>':"";
+}
+
+/* ---------- analysis ---------- */
+function weeks(){
+  const ds=Object.keys(DB.entries).sort();if(!ds.length)return[];
+  const map={};
+  for(const d of ds){const w=weekOf(d);(map[w]=map[w]||[]).push([d,DB.entries[d]])}
+  return Object.keys(map).map(Number).sort((a,b)=>a-b).map(w=>{
+    const es=map[w].map(x=>x[1]);
+    const W=es.map(e=>e.weight).filter(v=>v!=null);
+    const waists=map[w].filter(x=>x[1].waist!=null);
+    return{w,n:es.length,wAvg:W.length?avg(W):null,wN:W.length,
+      lifts:es.filter(e=>LIFT.has(e.session)&&e.done).length,
+      core:es.filter(e=>e.core).length,
+      protHit:es.filter(e=>e.protein!=null&&e.protein>=DB.settings.protein).length,
+      protN:es.filter(e=>e.protein!=null).length,
+      kcal:avg(es.map(e=>e.kcal).filter(v=>v!=null)),
+      steps:avg(es.map(e=>e.steps).filter(v=>v!=null)),
+      sleep:avg(es.map(e=>e.sleep).filter(v=>v!=null)),
+      waist:waists.length?waists[waists.length-1][1].waist:null};
+  });
+}
+function rolling7(){
+  const ds=Object.keys(DB.entries).filter(d=>DB.entries[d].weight!=null).sort();
+  return ds.map(d=>{const from=addDays(d,-6);const v=ds.filter(x=>x>=from&&x<=d).map(x=>DB.entries[x].weight);return{d,v:avg(v),raw:DB.entries[d].weight}});
+}
+function advice(){
+  const out=[];const ws=weeks().filter(x=>x.wN>=3&&x.w>=1);
+  const cur=weekOf(today());
+  const thisW=weeks().find(x=>x.w===cur);
+  if(thisW){
+    if(thisW.protN&&thisW.protHit<thisW.protN)out.push(["warn",`Protein hit on ${thisW.protHit}/${thisW.protN} logged days this week. Keep the daily whey scoop and a protein item at every meal.`]);
+    if(thisW.sleep!=null&&thisW.sleep<7)out.push(["warn",`Sleep averaging ${r1(thisW.sleep)} h. Under 7 h makes it harder to keep muscle while dieting.`]);
+    if(thisW.steps!=null&&thisW.steps<stepTarget(cur)-1000)out.push(["warn",`Steps averaging ${Math.round(thisW.steps).toLocaleString()} vs ${stepTarget(cur).toLocaleString()} target.`]);
+  }
+  if(ws.length<2){out.unshift(["",`Need two weeks with 3+ weigh-ins each before the calorie rules apply. So far: ${ws.length}.`]);return out}
+  const ch=[];for(let i=1;i<ws.length;i++)if(ws[i].w===ws[i-1].w+1)ch.push({w:ws[i].w,d:ws[i].wAvg-ws[i-1].wAvg});
+  const last=ch[ch.length-1];
+  const waistAll=Object.keys(DB.entries).filter(d=>DB.entries[d].waist!=null).sort();
+  const waistDelta=(days)=>{if(waistAll.length<2)return null;const L=waistAll[waistAll.length-1],from=addDays(L,-days);const base=waistAll.filter(d=>d<=from);const b=base.length?base[base.length-1]:waistAll[0];return DB.entries[L].waist-DB.entries[b].waist};
+  const fast=ch.length>=2&&ch.slice(-2).every(c=>c.d<-0.75);
+  const n4=ws.length>=4?ws[ws.length-1].wAvg-ws[ws.length-4].wAvg:null;
+  const flat3=n4!=null&&Math.abs(n4)<0.25;
+  const wd=waistDelta(21);
+  if(fast)out.unshift(["bad","Losing faster than 0.75 kg/week for 2 weeks. Add about 150–200 kcal a day (rice or idli) and reassess."]);
+  else if(flat3&&(wd==null||wd>=0))out.unshift(["warn","Weight and waist flat for 3 weeks. Cut about 150 kcal a day (½ cup less rice or 1 fewer chapati) OR add walking — not both. Never cut protein."]);
+  else if(flat3&&wd<0)out.unshift(["good",`Weight flat but waist down ${r1(-wd)} in over 3 weeks: you're losing fat and keeping muscle. Change nothing.`]);
+  else if(last&&last.d<=-0.25&&last.d>=-0.75)out.unshift(["good",`Down ${r1(-last.d)} kg vs last week's average. On pace — change nothing.`]);
+  else if(last)out.unshift(["",`Week-to-week change ${last.d>0?"+":""}${r1(last.d)} kg. One week is noise; the rules act on 2–3 week trends.`]);
+  return out;
+}
+
+/* ---------- charts (inline SVG) ---------- */
+function chart(el,pts,opt){
+  if(pts.length<1){el.innerHTML='<div class="mute">No data yet.</div>';return}
+  const W=640,H=220,L=34,R=8,T=10,B=22;
+  const xs=pts.map(p=>parse(p.d).getTime());let x0=Math.min(...xs),x1=Math.max(...xs);if(x1===x0){x0-=864e5*3;x1+=864e5*3}
+  let ys=pts.flatMap(p=>[p.raw,p.v]).filter(v=>v!=null);if(opt.band)ys.push(...opt.band);
+  let y0=Math.floor(Math.min(...ys)-0.5),y1=Math.ceil(Math.max(...ys)+0.5);
+  const X=t=>L+(t-x0)/(x1-x0)*(W-L-R),Y=v=>T+(y1-v)/(y1-y0)*(H-T-B);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">`;
+  const step=Math.max(1,Math.round((y1-y0)/5));
+  for(let v=y0;v<=y1;v+=step)s+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-4}" y="${Y(v)+3}" text-anchor="end">${v}</text>`;
+  if(opt.band)s+=`<rect x="${L}" width="${W-L-R}" y="${Y(opt.band[1])}" height="${Y(opt.band[0])-Y(opt.band[1])}" fill="var(--good)" opacity=".12"/>`;
+  s+=`<text x="${L}" y="${H-6}">${fmt(iso(new Date(x0)))}</text><text x="${W-R}" y="${H-6}" text-anchor="end">${fmt(iso(new Date(x1)))}</text>`;
+  pts.forEach(p=>{if(p.raw!=null)s+=`<circle cx="${X(parse(p.d).getTime())}" cy="${Y(p.raw)}" r="${opt.line?2.5:4}" fill="var(--acc)" opacity="${opt.line?.35:1}"><title>${fmt(p.d)}: ${p.raw}</title></circle>`});
+  if(opt.line){const d=pts.filter(p=>p.v!=null).map((p,i)=>(i?"L":"M")+X(parse(p.d).getTime()).toFixed(1)+" "+Y(p.v).toFixed(1)).join(" ");s+=`<path d="${d}" fill="none" stroke="var(--acc)" stroke-width="2.5"/>`}
+  else if(pts.length>1){const d=pts.map((p,i)=>(i?"L":"M")+X(parse(p.d).getTime()).toFixed(1)+" "+Y(p.raw).toFixed(1)).join(" ");s+=`<path d="${d}" fill="none" stroke="var(--acc)" stroke-width="2"/>`}
+  el.innerHTML=s+"</svg>";
+}
+
+/* ---------- render ---------- */
+function render(){
+  const t=today(),w=weekOf(t);
+  $("hdr").textContent=(w>=1?`Week ${w} of 26 · ${phase(w).n}`:`Starts ${fmt(DB.settings.start)}`)+` · ${Object.keys(DB.entries).length} days logged`;
+  if(!$("f-date").value)fillForm(t);else planFor($("f-date").value);
+  // settings
+  const S=DB.settings;$("s-start").value=S.start;$("s-w0").value=S.w0;$("s-waist0").value=S.waist0;$("s-protein").value=S.protein;$("s-klo").value=S.klo;$("s-khi").value=S.khi;
+  $("g-owner").value=GH.owner;$("g-repo").value=GH.repo;$("g-token").value=GH.token;$("g-auto").checked=!!GH.auto;
+  // kpis
+  const ws=weeks(),cw=ws.find(x=>x.w===w)||{},pw=ws.find(x=>x.w===w-1)||{};
+  const rw=rolling7(),lastAvg=rw.length?rw[rw.length-1].v:null;
+  const lw=lastWaist();
+  const k=[
+    [r1(lastAvg),"7-day avg weight (kg)"+(lastAvg!=null?` · ${r1(lastAvg-S.w0)} from start`:"")],
+    [lw?r1(DB.entries[lw].waist):"–","Waist (in)"+(lw?` · ${r1(DB.entries[lw].waist-S.waist0)} from start`:"")],
+    [`${cw.lifts||0}/5`,"Lifting sessions"],[`${cw.core||0}/4`,"Core sessions"],
+    [cw.protN?`${cw.protHit}/${cw.protN}`:"–",`Days ≥ ${S.protein} g protein`],
+    [cw.kcal!=null?Math.round(cw.kcal):"–",`Avg kcal (target ${S.klo}–${S.khi})`],
+    [cw.steps!=null?Math.round(cw.steps).toLocaleString():"–","Avg steps"],
+    [cw.sleep!=null?r1(cw.sleep):"–","Avg sleep (h)"]];
+  $("kpis").innerHTML=k.map(([v,l])=>`<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+  $("advice").innerHTML=advice().map(([c,m])=>`<div class="advice ${c}">${m}</div>`).join("");
+  chart($("wChart"),rw,{line:true,band:[65,67]});
+  chart($("waistChart"),Object.keys(DB.entries).filter(d=>DB.entries[d].waist!=null).sort().map(d=>({d,raw:DB.entries[d].waist})),{band:[34,35]});
+  $("weekTbl").innerHTML=`<tr><th>Wk</th><th>Avg kg</th><th>Δ</th><th>Waist</th><th>Lifts</th><th>Core</th><th>Prot</th><th>kcal</th><th>Steps</th><th>Sleep</th></tr>`+
+    ws.slice().reverse().map((x,i,a)=>{const prev=ws.find(y=>y.w===x.w-1);const d=prev&&prev.wAvg!=null&&x.wAvg!=null?x.wAvg-prev.wAvg:null;
+    return`<tr><td>${x.w}</td><td>${r1(x.wAvg)}</td><td>${d==null?"–":(d>0?"+":"")+r1(d)}</td><td>${r1(x.waist)}</td><td class="${x.lifts>=5?"ok":""}">${x.lifts}/5</td><td>${x.core}/4</td><td>${x.protN?x.protHit+"/"+x.protN:"–"}</td><td>${x.kcal!=null?Math.round(x.kcal):"–"}</td><td>${x.steps!=null?Math.round(x.steps):"–"}</td><td>${r1(x.sleep)}</td></tr>`}).join("");
+  // history
+  const ds=Object.keys(DB.entries).sort().reverse();
+  $("histTbl").innerHTML=`<tr><th>Date</th><th>Session</th><th>kg</th><th>Prot</th><th>kcal</th><th>Steps</th><th>Sleep</th><th>Waist</th></tr>`+
+    (ds.length?ds.map(d=>{const e=DB.entries[d];return`<tr data-d="${d}" style="cursor:pointer"><td>${fmt(d)}</td><td>${e.session}${LIFT.has(e.session)?(e.done?' <span class="ok">✓</span>':' <span class="no">✗</span>'):""}${e.core?" +core":""}</td><td>${r1(e.weight)}</td><td>${e.protein??"–"}</td><td>${e.kcal??"–"}</td><td>${e.steps??"–"}</td><td>${e.sleep??"–"}</td><td>${e.waist??"–"}</td></tr>`}).join(""):`<tr><td colspan="8" class="mute">Nothing logged yet.</td></tr>`);
+  document.querySelectorAll("#histTbl tr[data-d]").forEach(tr=>tr.onclick=()=>{fillForm(tr.dataset.d);document.querySelector('nav button[data-t="today"]').click()});
+}
+
+/* ---------- settings ---------- */
+$("saveSettings").onclick=()=>{
+  const S=DB.settings;S.start=$("s-start").value||S.start;
+  for(const[k,id]of[["w0","s-w0"],["waist0","s-waist0"],["protein","s-protein"],["klo","s-klo"],["khi","s-khi"]]){const v=num($(id).value);if(v!=null)S[k]=v}
+  S.updated=Date.now();store(KEY,DB);toast("Settings saved");render();
+};
+
+/* ---------- export / import ---------- */
+function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+$("expJson").onclick=()=>download(`tracker-${today()}.json`,JSON.stringify(DB,null,1),"application/json");
+$("expCsv").onclick=()=>{
+  const cols=["date","week","session","done","core","whey","weight","steps","sleep","protein","kcal","cardio","waist","notes"];
+  const rows=Object.keys(DB.entries).sort().map(d=>{const e=DB.entries[d];return cols.map(c=>{const v=c==="date"?d:c==="week"?weekOf(d):e[c];const s=v==null?"":String(v);return/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(",")});
+  download(`tracker-${today()}.csv`,[cols.join(","),...rows].join("\n"),"text/csv");
+};
+$("impBtn").onclick=()=>$("impFile").click();
+$("impFile").onchange=async ev=>{
+  try{const j=JSON.parse(await ev.target.files[0].text());if(!j.entries)throw 0;merge(j);store(KEY,DB);toast("Imported");render()}catch(e){toast("Not a tracker JSON file")}
+  ev.target.value="";
+};
+$("wipe").onclick=()=>{if(confirmWipe()){DB=structuredClone(DEF);DB.settings.start=nextMonday();store(KEY,DB);render();toast("Deleted")}};
+function confirmWipe(){const b=$("wipe");if(b.dataset.arm){delete b.dataset.arm;b.textContent="Delete all data on this device";return true}b.dataset.arm=1;b.textContent="Tap again to confirm";setTimeout(()=>{delete b.dataset.arm;b.textContent="Delete all data on this device"},4000);return false}
+function merge(remote){
+  for(const[d,e]of Object.entries(remote.entries||{})){const l=DB.entries[d];if(!l||(e.updated||0)>(l.updated||0))DB.entries[d]=e}
+  if(remote.settings&&(remote.settings.updated||0)>(DB.settings.updated||0))DB.settings=Object.assign({},DEF.settings,remote.settings);
+}
+
+/* ---------- GitHub sync ---------- */
+const b64e=s=>btoa(unescape(encodeURIComponent(s))),b64d=s=>decodeURIComponent(escape(atob(s.replace(/\n/g,""))));
+function ghUrl(){return`https://api.github.com/repos/${encodeURIComponent(GH.owner)}/${encodeURIComponent(GH.repo)}/contents/data.json`}
+function ghHead(){return{Authorization:"Bearer "+GH.token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}}
+function gstat(m){$("g-status").textContent=m}
+$("g-save").onclick=()=>{GH.owner=$("g-owner").value.trim();GH.repo=$("g-repo").value.trim();GH.token=$("g-token").value.trim();GH.auto=$("g-auto").checked;store(GKEY,GH);gstat("Sync settings saved.")};
+async function ghGet(){
+  const r=await fetch(ghUrl()+"?t="+Date.now(),{headers:ghHead(),cache:"no-store"});
+  if(r.status===404)return null;
+  if(!r.ok)throw new Error(r.status===401?"Token rejected (401)":r.status===403?"No access to repo (403)":"GitHub error "+r.status);
+  const j=await r.json();GH.sha=j.sha;store(GKEY,GH);return JSON.parse(b64d(j.content));
+}
+async function ghPull(){
+  if(!GH.token)return gstat("Add owner, repo and token first.");
+  gstat("Pulling…");
+  try{const remote=await ghGet();if(!remote)return gstat("No data.json in the repo yet — push first.");merge(remote);store(KEY,DB);render();gstat("Pulled and merged "+new Date().toLocaleTimeString())}catch(e){gstat("Pull failed: "+e.message)}
+}
+async function ghPush(quiet){
+  if(!GH.token)return gstat("Add owner, repo and token first.");
+  gstat("Pushing…");
+  try{
+    const remote=await ghGet();if(remote){merge(remote);store(KEY,DB)}
+    const body={message:"Tracker update "+new Date().toISOString(),content:b64e(JSON.stringify(DB,null,1))};
+    if(remote)body.sha=GH.sha;
+    const r=await fetch(ghUrl(),{method:"PUT",headers:Object.assign({"Content-Type":"application/json"},ghHead()),body:JSON.stringify(body)});
+    if(!r.ok)throw new Error(r.status===409||r.status===422?"Conflict — pull, then push again":"GitHub error "+r.status);
+    const j=await r.json();GH.sha=j.content.sha;store(GKEY,GH);
+    gstat("Pushed "+new Date().toLocaleTimeString());if(!quiet)toast("Pushed to GitHub");render();
+  }catch(e){gstat("Push failed: "+e.message);if(quiet)toast("Saved locally; GitHub push failed")}
+}
+$("g-pull").onclick=ghPull;$("g-push").onclick=()=>ghPush(false);
+
+render();
+if(GH.auto&&GH.token)ghPull();
+</script>
+</body>
+</html>
