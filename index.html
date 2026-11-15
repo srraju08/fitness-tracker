@@ -562,6 +562,102 @@ const FIG={
  "Side plank":{A:[54,76,62,82,112,102,136,111,160,120,64,124,84,124],B:[54,76,62,82,112,100,136,110,160,120,64,124,84,124],tA:[4,5],tB:[4,5]},
  "Bird dog":{A:[120,74,110,80,70,82,72,124,48,124,110,102,110,124],B:[120,74,110,80,70,82,44,82,18,82,130,78,150,76],ghost:1,tA:[-6,0],tB:[-8,0]}
 };
+/* ---------- extra exercises: alternatives and variations ---------- */
+const BENCH=L(36,100,112,100)+L(46,100,46,125)+L(102,100,102,125);
+const LIE=(e,w)=>[40,92,50,96,96,98,118,98,122,125].concat(e,w);
+const SEATF=L(84,96,116,96)+L(100,96,100,125);
+const ADD_EX={
+ "Barbell bench press":{r:[8,12],u:"kg",s:"Empty bar (20 kg) first",c:["Eyes under the bar, feet flat, shoulder blades pinched.","Lower the bar to mid-chest with elbows about 45° from your body.","Press up and slightly back. Use a spotter or safety pins."]},
+ "Dumbbell bench press":{r:[10,12],u:"kg/hand",s:"6–8 kg/hand",c:["Lie flat, feet planted, shoulder blades pinched.","Lower dumbbells beside the chest, elbows about 45°.","Press up until arms are straight, dumbbells close but not clanking."]},
+ "Push-up":{r:[8,15],u:"bw",s:"Bodyweight",c:["Hands under shoulders, body in one straight line.","Lower until chest is a fist from the floor, elbows about 45°.","Too hard? Use the incline push-up instead."]},
+ "Incline push-up":{r:[10,15],u:"bw",s:"Bodyweight, hands on a bench",c:["Hands on a bench or bar, body straight.","Lower chest to the edge with control.","The lower the bench, the harder it gets."]},
+ "Pec deck":{r:[12,15],u:"kg",s:"Light trial",c:["Seat so handles are at chest height.","Bring arms together in a wide hug; squeeze 1 s.","Open slowly until you feel a stretch, not pain, in the chest."]},
+ "Cable fly":{r:[12,15],u:"kg",s:"Light trial",c:["Pulleys at shoulder height, one step forward, slight lean.","Soft elbows; bring hands together in front of the chest.","Return slowly; don't let the arms drift behind you."]},
+ "Seated dumbbell shoulder press":{r:[10,12],u:"kg/hand",s:"4–6 kg/hand",c:["Bench upright, back against the pad.","Start with dumbbells at shoulder height, palms forward.","Press up until arms are nearly straight; no arching."]},
+ "Cable lateral raise":{r:[12,15],u:"kg",s:"Light trial · one arm at a time",c:["Stand side-on, low pulley, handle in the far hand.","Raise to shoulder height leading with the elbow.","Lower over 2 s; keep the body still."]},
+ "Dumbbell front raise":{r:[12,15],u:"kg/hand",s:"2–4 kg/hand",c:["Arms straight with a soft elbow.","Raise in front to shoulder height, no higher.","No swinging; lower slowly."]},
+ "Reverse pec deck":{r:[12,15],u:"kg",s:"Light trial",c:["Face the pad, handles at shoulder height.","Sweep arms out and back, squeezing the back of the shoulders.","Don't shrug; return slowly."]},
+ "Assisted pull-up":{r:[6,10],u:"kg",s:"Assist weight: more = easier",c:["Kneel on the pad, grip a little wider than shoulders.","Pull your chest toward the bar, elbows down and back.","Lower all the way to straight arms. Reduce the assist weight as you get stronger."]},
+ "One-arm dumbbell row":{r:[10,12],u:"kg",s:"8–10 kg",c:["One hand and knee on the bench, back flat.","Pull the dumbbell to your hip, elbow close to the body.","Lower to a full stretch without twisting."]},
+ "Barbell row":{r:[8,12],u:"kg",s:"Empty bar first",c:["Hinge to about 45°, back flat, knees soft.","Pull the bar to your lower ribs.","Lower with control; don't stand up between reps."]},
+ "Straight-arm pulldown":{r:[12,15],u:"kg",s:"Light trial",c:["High pulley, step back and hinge slightly.","Arms nearly straight; sweep the bar down to your thighs.","Feel the lats; return slowly to shoulder height."]},
+ "Machine row":{r:[10,12],u:"kg",s:"Light trial",c:["Chest against the pad, sit tall.","Pull handles to your ribs, squeeze shoulder blades.","Return until arms are straight."]},
+ "Hammer curl":{r:[10,12],u:"kg/hand",s:"4–5 kg/hand",c:["Palms face each other the whole rep.","Elbows fixed at your sides.","Lower slowly."]},
+ "Cable curl":{r:[10,12],u:"kg",s:"Light trial",c:["Low pulley, bar or rope.","Elbows pinned; curl up without leaning back.","Constant tension: don't rest at the bottom."]},
+ "Machine preacher curl":{r:[10,12],u:"kg",s:"Light trial",c:["Armpits snug over the top of the pad.","Curl up, squeeze 1 s.","Lower almost to straight; don't bounce at the bottom."]},
+ "Overhead triceps extension":{r:[10,12],u:"kg",s:"One dumbbell, 5–8 kg",c:["Hold one dumbbell overhead with both hands.","Lower behind your head, elbows pointing up.","Straighten fully; keep the ribs down."]},
+ "Bench dip":{r:[8,12],u:"bw",s:"Bodyweight, knees bent",c:["Hands on the bench edge behind you, fingers forward.","Lower until upper arms are about parallel to the floor.","Stop if the front of your shoulder hurts."]},
+ "Skull crusher":{r:[10,12],u:"kg",s:"EZ bar, light",c:["Lie flat, bar above your chest, arms straight.","Bend only at the elbows, lowering toward your forehead.","Elbows stay pointing up; straighten fully."]},
+ "Barbell back squat":{r:[6,10],u:"kg",s:"Empty bar first",c:["Bar on upper back, feet shoulder-width, toes slightly out.","Sit down and back until thighs are about parallel.","Chest up, knees track toes; use safety bars."]},
+ "Smith machine squat":{r:[8,12],u:"kg",s:"Bar only",c:["Feet slightly in front of the bar.","Squat until thighs are about parallel, back flat.","Drive up through the whole foot."]},
+ "Bulgarian split squat":{r:[8,10],u:"kg/hand",s:"Bodyweight first · reps per leg",c:["Rear foot on a bench, front foot about a stride ahead.","Drop the back knee straight down.","Front knee tracks toes; push through the front heel."]},
+ "Walking lunge":{r:[10,12],u:"kg/hand",s:"Bodyweight first · reps per leg",c:["Long step forward, torso upright.","Lower until the back knee nearly touches the floor.","Push off the front heel into the next step."]},
+ "Step-up":{r:[10,12],u:"kg/hand",s:"Bodyweight first · reps per leg",c:["Box at about knee height.","Step up with the whole foot on the box; drive through the heel.","Lower with control; don't push off the back foot."]},
+ "Glute bridge":{r:[12,15],u:"bw",s:"Bodyweight",c:["Lie on your back, knees bent, feet flat.","Drive hips up until shoulders, hips and knees line up.","Squeeze glutes 1 s; ribs down."]},
+ "Cable kickback":{r:[12,15],u:"kg",s:"Light trial · reps per leg",c:["Ankle strap, hold the machine, slight forward lean.","Kick the leg back from the hip, knee nearly straight.","Don't arch your lower back."]},
+ "Hip abduction machine":{r:[12,15],u:"kg",s:"Light trial",c:["Sit tall, pads on the outside of the knees.","Push knees out, pause 1 s.","Return slowly."]},
+ "Lying leg curl":{r:[10,12],u:"kg",s:"Light trial",c:["Lie face down, knees just off the pad edge.","Curl heels toward your glutes; hips stay down.","Lower over 2–3 s."]},
+ "Barbell Romanian deadlift":{r:[8,12],u:"kg",s:"Empty bar first",c:["Bar close to your legs, soft knees.","Push hips back with a flat back until hamstrings stretch.","Squeeze glutes to stand; bar stays close."]},
+ "Seated calf raise":{r:[12,20],u:"kg",s:"Light trial",c:["Pad on top of the thighs, balls of feet on the step.","Full stretch at the bottom.","Rise high, pause 1 s."]},
+ "Hanging knee raise":{r:[8,12],u:"bw",s:"Bodyweight",core:1,c:["Hang from the bar, shoulders active.","Curl knees up toward your chest, pelvis tilting up.","Lower slowly; no swinging."]},
+ "Lying leg raise":{r:[10,12],u:"bw",s:"Bodyweight",core:1,c:["Lower back pressed into the floor, hands by your sides.","Lower straight legs slowly as far as the back stays down.","Raise back up to vertical."]},
+ "Crunch":{r:[12,15],u:"bw",s:"Bodyweight",core:1,c:["Knees bent, feet flat.","Curl shoulders off the floor; ribs toward pelvis.","Don't pull on your neck."]},
+ "Mountain climber":{r:[20,30],u:"bw",s:"Bodyweight · total reps",core:1,c:["High plank, hands under shoulders.","Drive one knee toward your chest, then switch.","Hips stay level; start slow."]},
+ "Farmer carry":{r:[30,45],u:"sec",s:"Heavy dumbbells, 30–45 s",core:1,c:["Heavy dumbbell in each hand, stand tall.","Walk with short steps, shoulders back.","Don't lean to either side."]}
+};
+Object.assign(EX,ADD_EX);
+Object.assign(FIG,{
+ "Barbell bench press":{A:LIE([56,108],[58,88]),B:LIE([54,74],[56,54]),ld:"bb",pr:BENCH},
+ "Dumbbell bench press":{A:LIE([56,108],[58,88]),B:LIE([54,74],[56,54]),ld:"db",pr:BENCH},
+ "Skull crusher":{A:LIE([54,74],[56,54]),B:LIE([54,74],[38,78]),ld:"bb",pr:BENCH},
+ "Push-up":{A:[52,104,60,108,110,112,135,116,160,120,78,110,62,124],B:[52,80,60,84,110,96,135,106,160,118,61,104,62,124],tA:[4,5],tB:[4,7]},
+ "Incline push-up":{A:[60,74,68,78,112,100,136,112,160,120,82,80,60,88],B:[54,57,62,62,110,92,135,108,160,120,61,75,60,88],tA:[4,5],tB:[4,5],pr:RC(40,88,30,6)+L(44,94,44,125)+L(66,94,66,125)},
+ "Pec deck":{A:[100,32,100,44,100,92,108,98,110,124,128,52,128,34],B:[100,32,100,44,100,92,108,98,110,124,112,50,106,34],ld:"grip",mir:1,tA:[3,0],tB:[3,0],pr:SEATF},
+ "Cable fly":{A:[100,26,100,38,100,80,106,102,108,125,124,46,144,48],B:[100,26,100,38,100,80,106,102,108,125,112,58,104,70],ld:"grip",mir:1,tA:[4,0],tB:[4,0]},
+ "Seated dumbbell shoulder press":{A:[77,32,80,44,80,94,106,94,108,124,90,60,88,42],B:[77,32,80,44,80,94,106,94,108,124,89,26,89,8],ld:"db",pr:SEAT},
+ "Cable lateral raise":{A:[100,26,100,38,100,80,106,102,108,125,106,58,108,76],B:[100,26,100,38,100,80,106,102,108,125,120,42,136,40],ld:"grip",mir:1,tA:[4,0],tB:[4,0]},
+ "Dumbbell front raise":{A:STAND([100,60],[101,80]),B:STAND([120,40],[140,40]),ld:"db"},
+ "Reverse pec deck":{A:[100,32,100,44,100,92,108,98,110,124,106,54,110,56],B:[100,32,100,44,100,92,108,98,110,124,122,50,142,50],ld:"grip",mir:1,tA:[3,0],tB:[3,0],pr:SEATF},
+ "Assisted pull-up":{A:[98,30,100,42,100,82,106,100,88,104,104,22,106,4],B:[96,10,98,22,98,62,104,80,86,84,90,32,106,4],ld:"bar",tA:[-6,0],tB:[-6,0],pr:L(76,4,136,4)},
+ "One-arm dumbbell row":{A:[114,66,104,70,64,74,60,100,58,125,104,92,104,112],B:[114,66,104,70,64,74,60,100,58,125,88,62,94,82],ld:"db",pr:RC(40,90,62,6)+L(98,72,98,90)+L(46,96,46,125)+L(96,96,96,125)},
+ "Barbell row":{A:[134,52,124,56,86,80,96,102,98,125,122,80,120,100],B:[134,52,124,56,86,80,96,102,98,125,98,62,106,84],ld:"bb"},
+ "Straight-arm pulldown":{A:[112,32,106,42,96,80,100,102,100,125,124,30,142,22],B:[112,32,106,42,96,80,100,102,100,125,108,64,106,84],ld:"grip",cab:[150,8],pr:L(156,0,156,125)},
+ "Machine row":{A:[80,32,80,44,80,94,106,94,108,124,104,60,124,58],B:[80,32,80,44,80,94,106,94,108,124,66,64,86,62],ld:"grip",pr:SEAT+L(98,48,98,88)},
+ "Hammer curl":{A:STAND([100,60],[101,80]),B:STAND([100,60],[112,48]),ld:"db"},
+ "Cable curl":{A:STAND([100,60],[101,80]),B:STAND([100,60],[112,48]),ld:"grip",cab:[112,122]},
+ "Machine preacher curl":{A:[94,44,90,56,80,94,106,94,108,124,112,78,132,92],B:[94,44,90,56,80,94,106,94,108,124,112,78,104,56],ld:"grip",pr:L(64,98,102,98)+L(82,98,82,125)+L(94,62,118,84)},
+ "Overhead triceps extension":{A:[77,32,80,44,80,94,106,94,108,124,84,24,70,36],B:[77,32,80,44,80,94,106,94,108,124,84,24,86,4],ld:"db",pr:SEAT},
+ "Bench dip":{A:[72,50,70,62,76,102,102,96,104,125,48,70,64,80],B:[70,28,68,40,74,80,100,84,104,125,66,60,64,80],pr:RC(40,80,30,6)+L(44,86,44,125)+L(66,86,66,125)},
+ "Barbell back squat":{A:[100,28,100,40,100,80,100,102,100,125,88,52,96,40],B:[102,52,98,64,80,100,110,104,102,125,86,76,94,62],ld:"bb"},
+ "Smith machine squat":{A:[100,28,100,40,100,80,100,102,100,125,88,52,96,40],B:[102,52,98,64,80,100,110,104,102,125,86,76,94,62],ld:"bb",pr:L(120,0,120,125)},
+ "Bulgarian split squat":{A:[92,28,92,40,90,78,100,100,100,125,92,58,93,78],B:[89,48,88,60,84,98,108,102,102,125,88,78,89,98],L2A:[72,100,44,90],L2B:[70,120,44,90],t2:[-8,2],ld:"db",pr:RC(18,90,32,6)+L(24,96,24,125)+L(44,96,44,125)},
+ "Walking lunge":{A:[92,28,92,40,92,80,92,102,92,125,92,58,93,78],B:[92,44,92,56,92,96,114,100,114,125,92,74,93,94],L2A:[92,102,92,125],L2B:[78,118,58,122],t2:[10,0],ld:"db"},
+ "Step-up":{A:[98,28,96,40,94,78,112,84,114,100,96,58,97,78],B:[112,6,112,18,112,56,114,78,114,100,112,36,113,56],L2A:[92,100,90,125],L2B:[106,74,102,92],ld:"db",pr:RC(100,100,36,25)},
+ "Glute bridge":{A:[40,114,50,118,90,118,112,98,118,124,66,122,82,122],B:[40,114,50,118,90,104,116,92,118,124,66,122,82,122]},
+ "Cable kickback":{A:[118,34,112,44,100,80,102,102,102,125,124,60,136,58],B:[118,34,112,44,100,80,102,102,102,125,124,60,136,58],L2A:[98,100,96,122],L2B:[80,90,62,98],t2:[-4,6],cab:[160,120],cabTo:"a2",pr:L(140,40,140,125)+L(166,0,166,125)},
+ "Hip abduction machine":{A:[100,32,100,44,100,92,106,96,106,124,110,70,114,90],B:[100,32,100,44,100,92,124,94,128,122,110,70,114,90],mir:1,tA:[3,0],tB:[3,0],pr:SEATF},
+ "Lying leg curl":{A:[40,90,50,94,98,96,128,96,156,96,52,106,60,100],B:[40,90,50,94,98,96,128,96,136,70,52,106,60,100],ld:"roll",tA:[0,6],tB:[8,0],pr:L(30,102,150,102)+L(40,102,40,125)+L(140,102,140,125)},
+ "Barbell Romanian deadlift":{A:STAND([101,60],[102,80]),B:[134,58,124,64,86,82,98,104,100,125,122,84,121,104],ld:"bb"},
+ "Seated calf raise":{A:[74,36,74,48,78,94,104,94,106,120,76,72,96,90],B:[74,36,74,48,78,94,104,88,106,114,76,72,96,84],tA:[11,0],tB:[11,6],pr:L(64,98,92,98)+L(80,98,80,125)+RC(104,121,26,4)},
+ "Hanging knee raise":{A:[98,30,100,42,100,82,100,104,100,124,104,22,106,4],B:[98,30,100,42,100,82,124,80,126,104,104,22,106,4],ld:"bar",tA:[6,2],tB:[6,2],pr:L(76,4,136,4)},
+ "Lying leg raise":{A:[46,112,56,116,100,117,104,94,106,70,74,122,90,122],B:[46,112,56,116,100,117,124,114,148,112,74,122,90,122],tA:[2,-8],tB:[6,-8]},
+ "Crunch":{A:[46,112,56,116,100,117,114,96,130,122,66,110,78,108],B:[60,92,68,100,100,117,114,96,130,122,76,96,84,92]},
+ "Mountain climber":{A:[52,80,60,84,108,94,134,106,160,118,61,104,62,124],B:[52,80,60,84,108,94,134,106,160,118,61,104,62,124],L2A:[134,106,160,118],L2B:[82,104,100,118],tA:[4,7],tB:[4,7],t2:[4,7]},
+ "Farmer carry":{A:[100,28,100,40,100,80,106,102,110,125,101,60,102,80],B:[100,28,100,40,100,80,94,102,90,125,101,60,102,80],L2A:[94,102,90,125],L2B:[106,102,110,125],ld:"db"}
+});
+const GROUPS={
+ "Chest":["Machine chest press","Incline chest press","Incline dumbbell press","Dumbbell bench press","Barbell bench press","Push-up","Incline push-up","Pec deck","Cable fly"],
+ "Shoulders":["Shoulder press machine","Seated dumbbell shoulder press","Dumbbell lateral raise","Cable lateral raise","Dumbbell front raise","Face pull","Reverse pec deck"],
+ "Back":["Lat pulldown","Assisted pull-up","Seated cable row","Chest-supported row","Machine row","One-arm dumbbell row","Barbell row","Straight-arm pulldown"],
+ "Biceps":["Dumbbell biceps curl","Biceps curl","Hammer curl","Cable curl","Machine preacher curl"],
+ "Triceps":["Triceps pushdown","Overhead triceps extension","Skull crusher","Bench dip"],
+ "Quads":["Leg press","Goblet squat","Leg extension","Smith machine squat","Barbell back squat","Bulgarian split squat","Walking lunge","Step-up"],
+ "Hamstrings & glutes":["Dumbbell Romanian deadlift","Barbell Romanian deadlift","Seated leg curl","Lying leg curl","Hip thrust","Glute bridge","Cable kickback","Hip abduction machine"],
+ "Calves":["Calf raise","Seated calf raise"],
+ "Core":["Plank","Side plank","Dead bug","Bird dog","Pallof press","Cable crunch","Reverse crunch","Crunch","Lying leg raise","Hanging knee raise","Mountain climber","Farmer carry"]
+};
+const groupOf=n=>Object.keys(GROUPS).find(g=>GROUPS[g].includes(n));
+
 function figSVG(name){
   if(!FIG[name])return"";
   return`<svg class="fig" viewBox="0 0 200 130" data-fig="${esc(name)}" role="img" aria-label="${esc(name)} movement">${FIG[name].pr||""}<line class="gnd" x1="0" y1="125.5" x2="200" y2="125.5"/><g class="gh"></g><g class="cb"></g><g class="b"></g></svg>`;
@@ -572,14 +668,18 @@ function drawFig(svg,t){
   const tA=F.tA||[10,0],tB=F.tB||[10,0],to=[tA[0]+(tB[0]-tA[0])*t,tA[1]+(tB[1]-tA[1])*t];
   const ln=(a,b,c,d)=>`<line x1="${a.toFixed(1)}" y1="${b.toFixed(1)}" x2="${c.toFixed(1)}" y2="${d.toFixed(1)}"/>`;
   const limbs=(q,sx)=>{const X=x=>sx?2*q[2]-x:x;return ln(X(q[2]),q[3],X(q[10]),q[11])+ln(X(q[10]),q[11],X(q[12]),q[13])+ln(X(q[4]),q[5],X(q[6]),q[7])+ln(X(q[6]),q[7],X(q[8]),q[9])+ln(X(q[8]),q[9],X(q[8]+(sx?-to[0]:to[0])),q[9]+to[1])};
-  let s=ln(p[2],p[3],p[4],p[5])+limbs(p,0)+(F.mir?limbs(p,1):"")+`<circle class="hd" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="7"/>`;
+  let s=ln(p[2],p[3],p[4],p[5]);
+  let a2=null;
+  if(F.L2A){const q=F.L2A.map((a,i)=>a+(F.L2B[i]-a)*t),t2=F.t2||tA;a2=q;s+=ln(p[4],p[5],q[0],q[1])+ln(q[0],q[1],q[2],q[3])+ln(q[2],q[3],q[2]+t2[0],q[3]+t2[1])}
+  s+=limbs(p,0)+(F.mir?limbs(p,1):"")+`<circle class="hd" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="7"/>`;
   const wx=p[12],wy=p[13],ld=F.ld;
-  const load=(x,y)=>ld==="db"?`<rect class="ld" x="${x-6}" y="${y-2.5}" width="12" height="5" rx="1.5"/>`:ld==="grip"?`<circle class="ld" cx="${x}" cy="${y}" r="3.5"/>`:ld==="bar"?`<line class="ld" x1="${x-16}" y1="${y}" x2="${x+16}" y2="${y}"/>`:"";
+  const load=(x,y)=>ld==="db"?`<rect class="ld" x="${x-6}" y="${y-2.5}" width="12" height="5" rx="1.5"/>`:ld==="grip"?`<circle class="ld" cx="${x}" cy="${y}" r="3.5"/>`:ld==="bar"?`<line class="ld" x1="${x-16}" y1="${y}" x2="${x+16}" y2="${y}"/>`:ld==="bb"?`<circle class="ld" cx="${x}" cy="${y}" r="8" fill-opacity=".25"/>`:"";
   if(ld==="plate")s+=`<line class="ld" x1="${(p[8]+1).toFixed(1)}" y1="${(p[9]-17).toFixed(1)}" x2="${(p[8]+11).toFixed(1)}" y2="${(p[9]+11).toFixed(1)}"/>`;
   else if(ld==="roll")s+=`<circle class="ld" cx="${(p[8]+(t<.5?2:-2)).toFixed(1)}" cy="${(p[9]-3).toFixed(1)}" r="4"/>`;
   else{s+=load(wx,wy);if(F.mir)s+=load(2*p[2]-wx,wy)}
   svg.querySelector(".b").innerHTML=s;
-  svg.querySelector(".cb").innerHTML=F.cab?`<line class="cab" x1="${F.cab[0]}" y1="${F.cab[1]}" x2="${wx.toFixed(1)}" y2="${wy.toFixed(1)}"/>`:"";
+  const cx=F.cabTo==="a2"&&a2?a2[2]:wx,cy=F.cabTo==="a2"&&a2?a2[3]:wy;
+  svg.querySelector(".cb").innerHTML=F.cab?`<line class="cab" x1="${F.cab[0]}" y1="${F.cab[1]}" x2="${cx.toFixed(1)}" y2="${cy.toFixed(1)}"/>`:"";
   if(F.ghost&&!svg.dataset.g){svg.dataset.g=1;const q=F.A;svg.querySelector(".gh").innerHTML=ln(q[2],q[3],q[10],q[11])+ln(q[10],q[11],q[12],q[13])+ln(q[4],q[5],q[6],q[7])+ln(q[6],q[7],q[8],q[9])}
 }
 const reduceMotion=(()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}})();
@@ -604,7 +704,8 @@ const unitLbl=u=>u==="kg/hand"?"kg/hand":u==="bw"?"kg, optional":u==="sec"?"":"k
 const fmtSet=(s,u)=>u==="sec"?`${s.r}s`:(s.w?`${s.w}×${s.r}`:`${s.r}`);
 let W={date:"",list:[]};// list: [{ex,target,range}]
 $("w-session").innerHTML=SESSIONS.map(s=>`<option>${s}</option>`).join("");
-$("w-addsel").innerHTML=Object.keys(EX).map(n=>`<option>${n}</option>`).join("")+`<option value="__custom">Other (type a name)…</option>`;
+function fillAddSel(){$("w-addsel").innerHTML=Object.keys(GROUPS).map(g=>`<optgroup label="${g}">${GROUPS[g].map(n=>`<option>${n}</option>`).join("")}</optgroup>`).join("")+`<option value="__custom">Other (type a name)…</option>`}
+fillAddSel();
 function renderWorkout(date,session){
   date=date||today();const wk=weekOf(date);
   const saved=(DB.entries[date]||{}).lifts;
@@ -634,11 +735,11 @@ function exCard(it,i,date,saved){
   const rows=Array.from({length:n},(_,k)=>setRow(i,k,u,sv&&sv.sets[k],last&&last.sets[k])).join("");
   return`<div class="ex${e.core?" core":""}" data-i="${i}">
    <h3><span>${esc(it.ex)}</span><span class="tgt">${it.target} × ${rangeTxt}${u==="sec"?" s":""}</span></h3>
-   <div class="last">${last?`Last (${fmt(last.d)}): ${last.sets.map(s=>fmtSet(s,u)).join(", ")}`:`Start: ${esc(e.s||"choose a weight you can control")}`}${best&&u!=="sec"&&best.w?` · Best ${best.w}×${best.r}`:""}</div>
+   ${it.swappedFrom?`<div class="mute">Swapped in for ${esc(it.swappedFrom)}</div>`:""}<div class="last">${last?`Last (${fmt(last.d)}): ${last.sets.map(s=>fmtSet(s,u)).join(", ")}`:`Start: ${esc(e.s||"choose a weight you can control")}`}${best&&u!=="sec"&&best.w?` · Best ${best.w}×${best.r}`:""}</div>
    ${hint?`<div class="hint">${hint}</div>`:""}
    <div class="setrow mute" style="margin-top:2px"><span></span><span>${u==="sec"?"—":"Weight ("+unitLbl(u)+")"}</span><span>${u==="sec"?"Seconds":"Reps"}</span><span></span></div>
    <div class="sets">${rows}</div>
-   <div class="exbtns"><button class="ghost small addset">+ Set</button>${last?`<button class="ghost small copy">Same as last</button>`:""}</div>
+   <div class="exbtns"><button class="ghost small addset">+ Set</button>${groupOf(it.ex)?`<button class="ghost small swap">Swap</button>`:""}${last?`<button class="ghost small copy">Same as last</button>`:""}</div>
    ${e.c&&e.c.length?`<details class="how"${last?"":" open"}><summary>How to do it</summary>${figSVG(it.ex)}<ol>${e.c.map(x=>`<li>${x}</li>`).join("")}</ol><a href="${ytLink(it.ex)}" target="_blank" rel="noopener">▶ Watch form videos</a></details>`:`<details class="how"><summary>How to do it</summary>${figSVG(it.ex)}<a href="${ytLink(it.ex)}" target="_blank" rel="noopener">▶ Watch form videos</a></details>`}
   </div>`;
 }
@@ -655,6 +756,17 @@ function bindCards(){
     const i=+card.dataset.i,it=W.list[i],u=(EX[it.ex]||{u:"kg"}).u;
     card.querySelector(".addset").onclick=()=>{const box=card.querySelector(".sets");const k=box.children.length;const last=lastFor(it.ex,W.date);box.insertAdjacentHTML("beforeend",setRow(i,k,u,null,last&&last.sets[k]));bindX(card)};
     const cp=card.querySelector(".copy");if(cp)cp.onclick=()=>{const last=lastFor(it.ex,W.date);const box=card.querySelector(".sets");box.innerHTML=last.sets.map((s,k)=>setRow(i,k,u,s,s)).join("");bindX(card)};
+    const sw=card.querySelector(".swap");
+    if(sw)sw.onclick=()=>{
+      if(card.querySelector(".swapsel"))return;
+      const g=groupOf(it.ex);
+      const sel=document.createElement("select");sel.className="swapsel";sel.style.marginTop="8px";
+      sel.innerHTML=`<option value="">Swap ${esc(it.ex)} for… (${g})</option>`+GROUPS[g].filter(n=>n!==it.ex).map(n=>`<option>${n}</option>`).join("");
+      sel.onchange=()=>{if(!sel.value)return;if(W.list.find(x=>x.ex===sel.value))return toast("Already in today's list");
+        const kept=collect();const old=it.ex;kept.forEach(k=>{if(k.ex===old)k.ex=sel.value});it.ex=sel.value;it.range=(EX[sel.value]||{r:[8,12]}).r;it.swappedFrom=old;
+        $("w-list").innerHTML=W.list.map((x,j)=>exCard(x,j,W.date,kept)).join("");bindCards();toast(`Swapped to ${sel.value}`)};
+      sw.parentElement.after(sel);sel.focus();
+    };
     bindX(card);
   });
 }
