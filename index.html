@@ -50,6 +50,22 @@ svg text{fill:var(--mute);font-size:10px}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
 .toast.show{opacity:1}
 ul.plain{margin:6px 0 0;padding-left:18px}
+.ex{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card)}
+.ex.core{background:var(--acc2)}
+.ex h3{margin:0;font-size:15px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.ex .tgt{font-size:12.5px;color:var(--mute);font-weight:500;white-space:nowrap}
+.ex .last{font-size:12.5px;color:var(--mute);margin:4px 0}
+.ex .hint{font-size:12.5px;font-weight:600;color:var(--good);margin:2px 0 4px}
+.setrow{display:grid;grid-template-columns:28px 1fr 1fr 28px;gap:8px;align-items:center;margin-top:6px}
+.setrow .n{font-size:12px;color:var(--mute);text-align:center}
+.setrow input{padding:8px}
+.setrow .x{background:none;color:var(--mute);padding:0;font-size:18px}
+.exbtns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+details.how{margin-top:6px;font-size:13.5px}
+details.how summary{color:var(--acc);font-weight:600;cursor:pointer}
+details.how ol{margin:6px 0;padding-left:18px}
+.sticky{position:sticky;bottom:72px;z-index:4;display:flex;gap:8px}
+.sticky button{flex:1;box-shadow:0 4px 14px rgba(0,0,0,.18)}
 </style>
 </head>
 <body>
@@ -92,6 +108,27 @@ ul.plain{margin:6px 0 0;padding-left:18px}
     <div style="margin-bottom:10px"><label>Notes (energy, pain, eating out…)</label><textarea id="f-notes"></textarea></div>
     <div class="btns"><button id="save">Save day</button><button class="ghost" id="clear">Clear form</button></div>
   </div>
+</section>
+
+<!-- WORKOUT -->
+<section class="tab" id="t-workout">
+  <div class="card">
+    <h2>Workout log</h2>
+    <div class="row">
+      <div><label>Date</label><input type="date" id="w-date"></div>
+      <div><label>Session</label><select id="w-session"></select></div>
+    </div>
+    <div class="mute" id="w-info"></div>
+  </div>
+  <div id="w-list"></div>
+  <div class="card">
+    <label>Add another exercise</label>
+    <div class="row" style="margin-bottom:0">
+      <select id="w-addsel"></select>
+      <button class="ghost" id="w-add">Add</button>
+    </div>
+  </div>
+  <div class="sticky"><button id="w-save">Save workout</button></div>
 </section>
 
 <!-- PROGRESS -->
@@ -181,6 +218,7 @@ ul.plain{margin:6px 0 0;padding-left:18px}
 
 <nav>
   <button data-t="today" class="on">Today</button>
+  <button data-t="workout">Workout</button>
   <button data-t="progress">Progress</button>
   <button data-t="history">History</button>
   <button data-t="settings">Settings</button>
@@ -236,7 +274,7 @@ function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");set
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.id==="t-"+b.dataset.t));
-  render();window.scrollTo(0,0);
+  render();if(b.dataset.t==="workout")renderWorkout($("w-date").value||$("f-date").value||today());window.scrollTo(0,0);
 });
 
 /* ---------- form ---------- */
@@ -254,7 +292,8 @@ $("f-date").onchange=()=>fillForm($("f-date").value);
 $("clear").onclick=()=>fillForm(today());
 $("save").onclick=()=>{
   const d=$("f-date").value;if(!d)return toast("Pick a date");
-  const e={session:$("f-session").value,done:$("f-done").checked,core:$("f-core").checked,whey:$("f-whey").checked,notes:$("f-notes").value.trim(),updated:Date.now()};
+  const prev=DB.entries[d]||{};
+  const e={lifts:prev.lifts,session:$("f-session").value,done:$("f-done").checked,core:$("f-core").checked,whey:$("f-whey").checked,notes:$("f-notes").value.trim(),updated:Date.now()};
   for(const k of["weight","steps","sleep","protein","kcal","cardio","waist"])e[k]=num($("f-"+k).value);
   if(e.weight!=null&&(e.weight<30||e.weight>200))return toast("Check the weight value");
   if(e.waist!=null&&(e.waist<20||e.waist>70))return toast("Waist is in inches");
@@ -370,7 +409,7 @@ function render(){
   // history
   const ds=Object.keys(DB.entries).sort().reverse();
   $("histTbl").innerHTML=`<tr><th>Date</th><th>Session</th><th>kg</th><th>Prot</th><th>kcal</th><th>Steps</th><th>Sleep</th><th>Waist</th></tr>`+
-    (ds.length?ds.map(d=>{const e=DB.entries[d];return`<tr data-d="${d}" style="cursor:pointer"><td>${fmt(d)}</td><td>${e.session}${LIFT.has(e.session)?(e.done?' <span class="ok">✓</span>':' <span class="no">✗</span>'):""}${e.core?" +core":""}</td><td>${r1(e.weight)}</td><td>${e.protein??"–"}</td><td>${e.kcal??"–"}</td><td>${e.steps??"–"}</td><td>${e.sleep??"–"}</td><td>${e.waist??"–"}</td></tr>`}).join(""):`<tr><td colspan="8" class="mute">Nothing logged yet.</td></tr>`);
+    (ds.length?ds.map(d=>{const e=DB.entries[d];return`<tr data-d="${d}" style="cursor:pointer"><td>${fmt(d)}</td><td>${e.session}${LIFT.has(e.session)?(e.done?' <span class="ok">✓</span>':' <span class="no">✗</span>'):""}${e.core?" +core":""}${e.lifts&&e.lifts.length?` · ${e.lifts.reduce((s,l)=>s+l.sets.length,0)} sets`:""}</td><td>${r1(e.weight)}</td><td>${e.protein??"–"}</td><td>${e.kcal??"–"}</td><td>${e.steps??"–"}</td><td>${e.sleep??"–"}</td><td>${e.waist??"–"}</td></tr>`}).join(""):`<tr><td colspan="8" class="mute">Nothing logged yet.</td></tr>`);
   document.querySelectorAll("#histTbl tr[data-d]").forEach(tr=>tr.onclick=()=>{fillForm(tr.dataset.d);document.querySelector('nav button[data-t="today"]').click()});
 }
 
@@ -385,8 +424,8 @@ $("saveSettings").onclick=()=>{
 function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 $("expJson").onclick=()=>download(`tracker-${today()}.json`,JSON.stringify(DB,null,1),"application/json");
 $("expCsv").onclick=()=>{
-  const cols=["date","week","session","done","core","whey","weight","steps","sleep","protein","kcal","cardio","waist","notes"];
-  const rows=Object.keys(DB.entries).sort().map(d=>{const e=DB.entries[d];return cols.map(c=>{const v=c==="date"?d:c==="week"?weekOf(d):e[c];const s=v==null?"":String(v);return/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(",")});
+  const cols=["date","week","session","done","core","whey","weight","steps","sleep","protein","kcal","cardio","waist","notes","workout"];
+  const rows=Object.keys(DB.entries).sort().map(d=>{const e=DB.entries[d];return cols.map(c=>{const v=c==="date"?d:c==="week"?weekOf(d):c==="workout"?(e.lifts||[]).map(l=>l.ex+": "+l.sets.map(s=>(s.w!=null?s.w+"x":"")+s.r).join(" ")).join(" | "):e[c];const s=v==null?"":String(v);return/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(",")});
   download(`tracker-${today()}.csv`,[cols.join(","),...rows].join("\n"),"text/csv");
 };
 $("impBtn").onclick=()=>$("impFile").click();
@@ -432,6 +471,152 @@ async function ghPush(quiet){
   }catch(e){gstat("Push failed: "+e.message);if(quiet)toast("Saved locally; GitHub push failed")}
 }
 $("g-pull").onclick=ghPull;$("g-push").onclick=()=>ghPush(false);
+
+/* ---------- workout logging ---------- */
+// u: "kg" | "kg/hand" | "bw" (bodyweight, weight optional) | "sec" (timed hold)
+const EX={
+ "Machine chest press":{r:[10,12],u:"kg",s:"20 kg",c:["Set the seat so the handles line up with mid-chest.","Squeeze shoulder blades back and down; keep them there.","Press out without locking elbows; lower over 2–3 s."]},
+ "Incline dumbbell press":{r:[10,12],u:"kg/hand",s:"5 kg/hand",c:["Bench at about 30°.","Dumbbells over upper chest, elbows about 45° from your body.","Lower to chest level, press up and slightly in."]},
+ "Shoulder press machine":{r:[10,12],u:"kg",s:"Light trial",c:["Back flat on the pad, handles at shoulder height.","Press up without shrugging your shoulders.","Stop just short of locking out; lower with control."]},
+ "Dumbbell lateral raise":{r:[12,15],u:"kg/hand",s:"2–4 kg/hand",c:["Slight bend in the elbows, palms facing down.","Lead with the elbows up to shoulder height, no higher.","No swinging; lower over 2 s."]},
+ "Triceps pushdown":{r:[12,15],u:"kg",s:"Light trial",c:["Elbows pinned to your sides.","Push down to full extension, squeeze 1 s.","Let it rise only to about 90° at the elbow."]},
+ "Lat pulldown":{r:[8,12],u:"kg",s:"25 kg",c:["Grip a little wider than shoulders; thighs locked under the pad.","Chest up, pull the bar to the top of your chest.","Drive elbows down and back; lean back only slightly."]},
+ "Seated cable row":{r:[10,12],u:"kg",s:"15–20 kg",c:["Sit tall, knees slightly bent.","Pull the handle to your lower ribs and squeeze shoulder blades.","Don't rock your torso to move the weight."]},
+ "Chest-supported row":{r:[10,12],u:"kg",s:"Light trial",c:["Chest stays on the pad the whole set.","Pull elbows back past your ribs.","Pause 1 s at the top, lower slowly."]},
+ "Face pull":{r:[12,15],u:"kg",s:"Light trial",c:["Rope at face height.","Pull toward your eyes, hands pulling apart.","Elbows high; squeeze the back of the shoulders."]},
+ "Dumbbell biceps curl":{r:[10,12],u:"kg/hand",s:"4–5 kg/hand",c:["Elbows fixed at your sides.","Curl without swinging your body.","Lower over 2–3 s to a full stretch."]},
+ "Leg press":{r:[10,12],u:"kg",s:"60 kg",c:["Feet shoulder-width, middle of the platform.","Lower until knees are about 90°, without your lower back lifting off the pad.","Push through the whole foot; don't lock the knees."]},
+ "Goblet squat":{r:[10,12],u:"kg",s:"6–8 kg",c:["Hold the dumbbell at your chest.","Sit down between your heels, knees tracking over toes.","Chest up, heels flat; stand up tall."]},
+ "Leg extension":{r:[12,15],u:"kg",s:"Light trial",c:["Knee lined up with the machine's pivot; pad on lower shin.","Straighten fully and pause 1 s.","Lower slowly."]},
+ "Seated leg curl":{r:[12,15],u:"kg",s:"Light trial",c:["Knee lined up with the pivot; thigh pad snug.","Curl all the way, pause 1 s.","Return slowly; don't let the stack slam."]},
+ "Calf raise":{r:[15,20],u:"bw",s:"Bodyweight",c:["Full stretch at the bottom.","Rise as high as you can onto the big toe.","Pause 1 s at the top."]},
+ "Incline chest press":{r:[10,12],u:"kg",s:"Light trial",c:["Seat set so handles line up with upper chest.","Shoulder blades back and down.","Press without locking out; lower over 2–3 s."]},
+ "Biceps curl":{r:[10,12],u:"kg/hand",s:"Light trial",c:["Superset with triceps pushdown: one set each, then rest.","Elbows fixed, no swinging.","Lower slowly."]},
+ "Dumbbell Romanian deadlift":{r:[10,12],u:"kg/hand",s:"5–8 kg/hand",c:["Soft knees; push your hips back.","Dumbbells slide down your thighs with a flat back.","Stop when hamstrings stretch (about mid-shin), then drive hips forward."]},
+ "Hip thrust":{r:[10,12],u:"bw",s:"Bodyweight, then add a plate",c:["Upper back on the bench edge, feet flat, shins vertical at the top.","Chin tucked, ribs down; drive through your heels.","Squeeze glutes 1 s at the top."]},
+ "Plank":{r:[30,60],u:"sec",s:"Bodyweight",core:1,c:["Forearms under shoulders.","Ribs down, glutes lightly tight, straight line head to heels.","Stop before your hips sag. Add 10 s every 2 weeks."]},
+ "Dead bug":{r:[10,10],u:"bw",s:"Bodyweight · reps per side",core:1,c:["Lower back gently pressed into the floor.","Slowly extend opposite arm and leg.","Breathe out as you extend; don't let the back arch."]},
+ "Cable crunch":{r:[12,15],u:"kg",s:"Light trial",core:1,c:["Kneel, rope held beside your head.","Curl ribs toward your pelvis.","Hips stay still; don't pull with your arms."]},
+ "Reverse crunch":{r:[12,12],u:"bw",s:"Bodyweight",core:1,c:["Lie flat, knees bent at 90°.","Curl your pelvis up off the floor.","Lower slowly, no leg swinging."]},
+ "Pallof press":{r:[12,12],u:"kg",s:"Light trial · reps per side",core:1,c:["Stand side-on to the cable at chest height.","Brace and press the handle straight out.","Hold 2 s; don't let your torso turn."]},
+ "Side plank":{r:[20,30],u:"sec",s:"Bodyweight · per side",core:1,c:["Elbow under shoulder, body in a straight line.","Hips high; shoulders stacked.","Use bent knees if needed. Add 10 s every 2 weeks."]},
+ "Bird dog":{r:[10,10],u:"bw",s:"Bodyweight · reps per side",core:1,c:["Hands under shoulders, knees under hips.","Reach opposite arm and leg out long.","Keep the pelvis level; pause 2 s."]}
+};
+// [exercise, sets weeks 1–4, sets week 5+]
+const PLAN={
+ "Push A":[["Machine chest press",3,4],["Incline dumbbell press",2,3],["Shoulder press machine",2,2],["Dumbbell lateral raise",2,3],["Triceps pushdown",2,2],["Plank",2,2],["Dead bug",2,2]],
+ "Pull A":[["Lat pulldown",3,3],["Seated cable row",2,3],["Chest-supported row",2,2],["Face pull",2,2],["Dumbbell biceps curl",2,2],["Cable crunch",2,2],["Reverse crunch",2,2]],
+ "Legs A":[["Leg press",3,3],["Goblet squat",2,2],["Leg extension",2,2],["Seated leg curl",2,2],["Calf raise",2,2]],
+ "Upper B":[["Incline chest press",2,2],["Lat pulldown",2,2],["Seated cable row",2,2],["Dumbbell lateral raise",2,3],["Biceps curl",2,3],["Triceps pushdown",2,3],["Pallof press",2,2],["Side plank",2,2]],
+ "Lower B":[["Dumbbell Romanian deadlift",2,2],["Hip thrust",2,2],["Leg press",2,2],["Seated leg curl",2,2],["Calf raise",2,2],["Reverse crunch",2,2],["Bird dog",2,2],["Plank",2,2]],
+ "Recovery":[],"Rest":[]
+};
+function setsFor(s1,s5,w){if(w===8||w===16||w===24)return Math.max(1,Math.ceil(s5/2));return w>=5?s5:s1}
+function repRange(name,idx,w){
+  const e=EX[name]||{r:[8,12]};if(e.core||e.u==="sec")return e.r;
+  if(w>=9&&w<=15&&idx===0)return[8,10];
+  if(w>=17&&w<=23&&idx<=1)return[8,10];
+  return e.r;
+}
+const ytLink=n=>"https://www.youtube.com/results?search_query="+encodeURIComponent(n+" proper form");
+function lastFor(name,before){
+  const ds=Object.keys(DB.entries).filter(d=>d<before).sort().reverse();
+  for(const d of ds){const l=(DB.entries[d].lifts||[]).find(x=>x.ex===name&&x.sets&&x.sets.length);if(l)return{d,sets:l.sets}}
+  return null;
+}
+function bestFor(name){
+  let b=null;for(const[d,e]of Object.entries(DB.entries))for(const l of e.lifts||[])if(l.ex===name)for(const s of l.sets||[]){const v=(s.w||0)*1000+(s.r||0);if(!b||v>b.v)b={v,w:s.w,r:s.r,d}}
+  return b;
+}
+const unitLbl=u=>u==="kg/hand"?"kg/hand":u==="bw"?"kg, optional":u==="sec"?"":"kg";
+const fmtSet=(s,u)=>u==="sec"?`${s.r}s`:(s.w?`${s.w}×${s.r}`:`${s.r}`);
+let W={date:"",list:[]};// list: [{ex,target,range}]
+$("w-session").innerHTML=SESSIONS.map(s=>`<option>${s}</option>`).join("");
+$("w-addsel").innerHTML=Object.keys(EX).map(n=>`<option>${n}</option>`).join("")+`<option value="__custom">Other (type a name)…</option>`;
+function renderWorkout(date,session){
+  date=date||today();const wk=weekOf(date);
+  const saved=(DB.entries[date]||{}).lifts;
+  session=session||(DB.entries[date]||{}).session||BY_DAY[parse(date).getDay()];
+  $("w-date").value=date;$("w-session").value=session;
+  const plan=PLAN[session]||[];
+  W={date,list:[]};
+  let liftIdx=0;
+  for(const[n,s1,s5]of plan){const e=EX[n];W.list.push({ex:n,target:setsFor(s1,s5,wk),range:repRange(n,e.core?99:liftIdx,wk)});if(!e.core)liftIdx++}
+  if(saved)for(const l of saved)if(!W.list.find(x=>x.ex===l.ex))W.list.push({ex:l.ex,target:l.sets.length,range:(EX[l.ex]||{r:[8,12]}).r});
+  const p=phase(wk);
+  $("w-info").innerHTML=plan.length?`Week ${wk} · ${p.n}. ${p.t}<br>Fill in what you actually did. Grey numbers are last time's; tap <b>Same as last</b> to copy them.`:
+    session==="Recovery"?"Recovery day: 25 min easy walk + 15 min mobility (hips, shoulders, hamstrings). No weights. Log the walk on the Today tab.":"Rest day. Nothing to log here.";
+  $("w-list").innerHTML=W.list.map((it,i)=>exCard(it,i,date,saved)).join("");
+  bindCards();
+}
+function exCard(it,i,date,saved){
+  const e=EX[it.ex]||{u:"kg",s:"",c:[]},u=e.u;
+  const sv=(saved||[]).find(x=>x.ex===it.ex);
+  const last=lastFor(it.ex,date),best=bestFor(it.ex);
+  const n=Math.max(it.target,sv?sv.sets.length:0);
+  const top=it.range[1];
+  let hint="";
+  if(last&&u!=="sec"&&last.sets.length>=it.target&&last.sets.every(s=>s.r>=top))hint=`Last time you hit ${top} reps on every set → add the smallest weight step today.`;
+  if(last&&u==="sec"&&last.sets.every(s=>s.r>=top)&&top<60)hint=`Holding ${top}s on every set → add 10 s.`;
+  const rangeTxt=it.range[0]===it.range[1]?it.range[0]:it.range[0]+"–"+it.range[1];
+  const rows=Array.from({length:n},(_,k)=>setRow(i,k,u,sv&&sv.sets[k],last&&last.sets[k])).join("");
+  return`<div class="ex${e.core?" core":""}" data-i="${i}">
+   <h3><span>${esc(it.ex)}</span><span class="tgt">${it.target} × ${rangeTxt}${u==="sec"?" s":""}</span></h3>
+   <div class="last">${last?`Last (${fmt(last.d)}): ${last.sets.map(s=>fmtSet(s,u)).join(", ")}`:`Start: ${esc(e.s||"choose a weight you can control")}`}${best&&u!=="sec"&&best.w?` · Best ${best.w}×${best.r}`:""}</div>
+   ${hint?`<div class="hint">${hint}</div>`:""}
+   <div class="setrow mute" style="margin-top:2px"><span></span><span>${u==="sec"?"—":"Weight ("+unitLbl(u)+")"}</span><span>${u==="sec"?"Seconds":"Reps"}</span><span></span></div>
+   <div class="sets">${rows}</div>
+   <div class="exbtns"><button class="ghost small addset">+ Set</button>${last?`<button class="ghost small copy">Same as last</button>`:""}</div>
+   ${e.c&&e.c.length?`<details class="how"><summary>How to do it</summary><ol>${e.c.map(x=>`<li>${x}</li>`).join("")}</ol><a href="${ytLink(it.ex)}" target="_blank" rel="noopener">▶ Watch form videos</a></details>`:`<details class="how"><summary>How to do it</summary><a href="${ytLink(it.ex)}" target="_blank" rel="noopener">▶ Watch form videos</a></details>`}
+  </div>`;
+}
+function setRow(i,k,u,val,lastv){
+  const wph=lastv&&lastv.w!=null?lastv.w:"";const rph=lastv?lastv.r:"";
+  return`<div class="setrow"><span class="n">${k+1}</span>
+   <input type="number" inputmode="decimal" step="0.5" class="sw" ${u==="sec"?"disabled":""} placeholder="${wph}" value="${val&&val.w!=null?val.w:""}">
+   <input type="number" inputmode="numeric" class="sr" placeholder="${rph}" value="${val&&val.r!=null?val.r:""}">
+   <button class="x" title="Remove set">×</button></div>`;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function bindCards(){
+  document.querySelectorAll("#w-list .ex").forEach(card=>{
+    const i=+card.dataset.i,it=W.list[i],u=(EX[it.ex]||{u:"kg"}).u;
+    card.querySelector(".addset").onclick=()=>{const box=card.querySelector(".sets");const k=box.children.length;const last=lastFor(it.ex,W.date);box.insertAdjacentHTML("beforeend",setRow(i,k,u,null,last&&last.sets[k]));bindX(card)};
+    const cp=card.querySelector(".copy");if(cp)cp.onclick=()=>{const last=lastFor(it.ex,W.date);const box=card.querySelector(".sets");box.innerHTML=last.sets.map((s,k)=>setRow(i,k,u,s,s)).join("");bindX(card)};
+    bindX(card);
+  });
+}
+function bindX(card){card.querySelectorAll(".x").forEach(b=>b.onclick=()=>{b.parentElement.remove();card.querySelectorAll(".setrow .n").forEach((n,k)=>n.textContent=k+1)})}
+function collect(){
+  const out=[];
+  document.querySelectorAll("#w-list .ex").forEach(card=>{
+    const it=W.list[+card.dataset.i];const sets=[];
+    card.querySelectorAll(".sets .setrow").forEach(r=>{const w=num(r.querySelector(".sw").value),rp=num(r.querySelector(".sr").value);if(rp!=null&&rp>0)sets.push({w,r:rp})});
+    if(sets.length)out.push({ex:it.ex,sets});
+  });
+  return out;
+}
+$("w-date").onchange=()=>renderWorkout($("w-date").value);
+$("w-session").onchange=()=>renderWorkout($("w-date").value,$("w-session").value);
+$("w-add").onclick=()=>{
+  let n=$("w-addsel").value;
+  if(n==="__custom"){n=(prompt("Exercise name")||"").trim();if(!n)return}
+  if(W.list.find(x=>x.ex===n))return toast("Already in today's list");
+  const kept=collect();
+  W.list.push({ex:n,target:3,range:(EX[n]||{r:[8,12]}).r});
+  $("w-list").innerHTML=W.list.map((it,i)=>exCard(it,i,W.date,kept)).join("");bindCards();
+  toast("Added "+n);
+};
+$("w-save").onclick=()=>{
+  const d=W.date||$("w-date").value;if(!d)return toast("Pick a date");
+  const lifts=collect();
+  const e=Object.assign({},DB.entries[d]||{});
+  e.session=$("w-session").value;e.lifts=lifts;e.updated=Date.now();
+  if(LIFT.has(e.session)&&lifts.some(l=>!(EX[l.ex]||{}).core))e.done=true;
+  if(lifts.some(l=>(EX[l.ex]||{}).core))e.core=true;
+  DB.entries[d]=e;
+  if(store(KEY,DB)){const n=lifts.reduce((a,l)=>a+l.sets.length,0);toast(`Saved ${n} sets`);if($("f-date").value===d)fillForm(d);render();renderWorkout(d,e.session);if(GH.auto&&GH.token)ghPush(true)}
+};
 
 render();
 if(GH.auto&&GH.token)ghPull();
