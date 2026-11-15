@@ -64,6 +64,14 @@ ul.plain{margin:6px 0 0;padding-left:18px}
 details.how{margin-top:6px;font-size:13.5px}
 details.how summary{color:var(--acc);font-weight:600;cursor:pointer}
 details.how ol{margin:6px 0;padding-left:18px}
+.fig{width:100%;max-width:300px;height:auto;display:block;margin:8px auto 4px;background:var(--bg);border-radius:10px}
+.fig .b line{stroke:var(--ink);stroke-width:4.5;stroke-linecap:round}
+.fig .b circle.hd{fill:var(--ink)}
+.fig .gh line{stroke:var(--ink);stroke-width:4.5;stroke-linecap:round;opacity:.3}
+.fig .prop{stroke:var(--mute);stroke-width:3;fill:none;stroke-linecap:round}
+.fig .gnd{stroke:var(--mute);stroke-width:1;opacity:.5}
+.fig .ld{fill:var(--acc);stroke:var(--acc);stroke-width:3;stroke-linecap:round}
+.fig .cab{stroke:var(--acc);stroke-width:1.5;stroke-dasharray:3 3}
 .sticky{position:sticky;bottom:72px;z-index:4;display:flex;gap:8px}
 .sticky button{flex:1;box-shadow:0 4px 14px rgba(0,0,0,.18)}
 </style>
@@ -519,6 +527,70 @@ function repRange(name,idx,w){
   return e.r;
 }
 const ytLink=n=>"https://www.youtube.com/results?search_query="+encodeURIComponent(n+" proper form");
+
+/* ---------- animated exercise figures (original drawings, side view) ----------
+   pose = [headX,headY, neckX,neckY, hipX,hipY, kneeX,kneeY, ankleX,ankleY, elbowX,elbowY, wristX,wristY] */
+const L=(x1,y1,x2,y2)=>`<line class="prop" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+const RC=(x,y,w,h)=>`<rect class="prop" x="${x}" y="${y}" width="${w}" height="${h}" rx="2"/>`;
+const SEAT=L(64,98,102,98)+L(70,98,66,42)+L(82,98,82,125);
+const STAND=(e,w)=>[100,28,100,40,100,80,100,102,100,125].concat(e,w);
+const FIG={
+ "Machine chest press":{A:[80,32,80,44,80,94,106,94,108,124,70,62,92,58],B:[80,32,80,44,80,94,106,94,108,124,100,56,122,54],ld:"grip",pr:SEAT},
+ "Incline chest press":{A:[80,32,80,44,80,94,106,94,108,124,70,58,90,50],B:[80,32,80,44,80,94,106,94,108,124,98,42,116,30],ld:"grip",pr:SEAT},
+ "Incline dumbbell press":{A:[52,70,62,76,98,100,124,98,126,124,60,92,66,72],B:[52,70,62,76,98,100,124,98,126,124,70,54,74,34],ld:"db",pr:L(52,80,98,106)+L(98,106,120,106)+L(100,106,100,125)},
+ "Shoulder press machine":{A:[77,32,80,44,80,94,106,94,108,124,90,60,88,42],B:[77,32,80,44,80,94,106,94,108,124,89,26,89,8],ld:"grip",pr:SEAT},
+ "Dumbbell lateral raise":{A:[100,26,100,38,100,80,106,102,108,125,106,58,108,76],B:[100,26,100,38,100,80,106,102,108,125,120,42,136,40],ld:"db",mir:1,tA:[4,0],tB:[4,0]},
+ "Triceps pushdown":{A:[104,28,102,40,98,80,100,102,100,125,100,62,120,62],B:[104,28,102,40,98,80,100,102,100,125,100,62,104,84],ld:"grip",cab:[140,6],pr:L(150,0,150,125)},
+ "Lat pulldown":{A:[88,40,89,52,88,94,112,94,112,124,93,30,95,10],B:[88,40,89,52,88,94,112,94,112,124,80,72,94,52],ld:"bar",cab:[95,0],pr:L(70,98,112,98)+L(90,98,90,125)+RC(104,82,14,6)},
+ "Seated cable row":{A:[73,50,72,62,70,100,96,92,120,104,95,72,118,78],B:[73,50,72,62,70,100,96,92,120,104,56,78,80,84],ld:"grip",cab:[168,80],tA:[2,-10],tB:[2,-10],pr:L(52,104,90,104)+L(124,90,126,118)+L(172,40,172,125)},
+ "Chest-supported row":{A:[122,58,114,66,84,100,106,104,106,124,118,88,120,110],B:[122,58,114,66,84,100,106,104,106,124,96,70,108,86],ld:"db",pr:L(100,112,132,72)+L(68,104,94,104)+L(84,104,84,125)},
+ "Face pull":{A:STAND([122,40],[142,34]).slice(),B:STAND([86,32],[110,24]),ld:"grip",cab:[150,30],pr:L(156,0,156,125)},
+ "Dumbbell biceps curl":{A:STAND([100,60],[101,80]),B:STAND([100,60],[112,48]),ld:"db"},
+ "Biceps curl":{A:STAND([100,60],[101,80]),B:STAND([100,60],[112,48]),ld:"db"},
+ "Leg press":{A:[49,61,56,70,76,106,96,72,124,88,72,96,84,104],B:[49,61,56,70,76,106,114,90,150,80,72,96,84,104],ld:"plate",tA:[4,-9],tB:[4,-9],pr:L(44,66,66,112)+L(60,112,92,112)+L(80,112,80,125)},
+ "Goblet squat":{A:[100,28,100,40,100,80,100,102,100,125,104,62,108,50],B:[101,52,98,64,82,100,110,104,102,125,108,84,112,72],ld:"db"},
+ "Leg extension":{A:[74,36,74,48,78,94,104,94,106,124,76,72,84,96],B:[74,36,74,48,78,94,104,94,132,92,76,72,84,96],ld:"roll",tA:[10,0],tB:[2,-10],pr:SEAT},
+ "Seated leg curl":{A:[74,36,74,48,78,94,104,94,132,94,76,72,84,96],B:[74,36,74,48,78,94,104,94,96,120,76,72,84,96],ld:"roll",tA:[2,-10],tB:[10,0],pr:SEAT+RC(94,82,18,6)},
+ "Calf raise":{A:STAND([101,60],[102,80]),B:[100,22,100,34,100,74,100,96,100,119,101,54,102,74],tA:[11,0],tB:[11,6],pr:RC(108,121,30,4)},
+ "Dumbbell Romanian deadlift":{A:STAND([101,60],[102,80]),B:[134,58,124,64,86,82,98,104,100,125,122,84,121,104],ld:"db"},
+ "Hip thrust":{A:[56,72,66,80,86,112,110,96,114,125,56,84,46,84],B:[56,72,66,80,94,80,116,82,116,125,56,84,46,84],pr:RC(30,82,38,12)+L(36,94,36,125)+L(62,94,62,125)},
+ "Plank":{A:[52,98,60,104,110,108,135,113,160,118,60,124,80,124],B:[52,98,60,104,110,107,135,112,160,118,60,124,80,124],tA:[4,7],tB:[4,7]},
+ "Dead bug":{A:[46,112,56,116,102,117,104,92,124,92,58,98,60,80],B:[46,112,56,116,102,117,128,110,154,112,42,106,28,110],tA:[6,-8],tB:[2,-10]},
+ "Cable crunch":{A:[110,44,106,56,100,94,100,124,74,124,116,62,112,48],B:[138,94,128,90,100,94,100,124,74,124,130,106,132,86],ld:"grip",cab:[118,4],tA:[-6,0],tB:[-6,0],pr:L(126,0,126,30)},
+ "Reverse crunch":{A:[46,112,56,116,100,117,112,94,130,98,74,122,90,122],B:[46,112,56,116,96,110,94,86,112,80,74,122,90,122],tA:[8,-4],tB:[8,-4]},
+ "Pallof press":{A:STAND([104,62],[112,56]),B:STAND([120,56],[138,56]),ld:"grip"},
+ "Side plank":{A:[54,76,62,82,112,102,136,111,160,120,64,124,84,124],B:[54,76,62,82,112,100,136,110,160,120,64,124,84,124],tA:[4,5],tB:[4,5]},
+ "Bird dog":{A:[120,74,110,80,70,82,72,124,48,124,110,102,110,124],B:[120,74,110,80,70,82,44,82,18,82,130,78,150,76],ghost:1,tA:[-6,0],tB:[-8,0]}
+};
+function figSVG(name){
+  if(!FIG[name])return"";
+  return`<svg class="fig" viewBox="0 0 200 130" data-fig="${esc(name)}" role="img" aria-label="${esc(name)} movement">${FIG[name].pr||""}<line class="gnd" x1="0" y1="125.5" x2="200" y2="125.5"/><g class="gh"></g><g class="cb"></g><g class="b"></g></svg>`;
+}
+function drawFig(svg,t){
+  const F=FIG[svg.dataset.fig];if(!F)return;
+  const p=F.A.map((a,i)=>a+(F.B[i]-a)*t);
+  const tA=F.tA||[10,0],tB=F.tB||[10,0],to=[tA[0]+(tB[0]-tA[0])*t,tA[1]+(tB[1]-tA[1])*t];
+  const ln=(a,b,c,d)=>`<line x1="${a.toFixed(1)}" y1="${b.toFixed(1)}" x2="${c.toFixed(1)}" y2="${d.toFixed(1)}"/>`;
+  const limbs=(q,sx)=>{const X=x=>sx?2*q[2]-x:x;return ln(X(q[2]),q[3],X(q[10]),q[11])+ln(X(q[10]),q[11],X(q[12]),q[13])+ln(X(q[4]),q[5],X(q[6]),q[7])+ln(X(q[6]),q[7],X(q[8]),q[9])+ln(X(q[8]),q[9],X(q[8]+(sx?-to[0]:to[0])),q[9]+to[1])};
+  let s=ln(p[2],p[3],p[4],p[5])+limbs(p,0)+(F.mir?limbs(p,1):"")+`<circle class="hd" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="7"/>`;
+  const wx=p[12],wy=p[13],ld=F.ld;
+  const load=(x,y)=>ld==="db"?`<rect class="ld" x="${x-6}" y="${y-2.5}" width="12" height="5" rx="1.5"/>`:ld==="grip"?`<circle class="ld" cx="${x}" cy="${y}" r="3.5"/>`:ld==="bar"?`<line class="ld" x1="${x-16}" y1="${y}" x2="${x+16}" y2="${y}"/>`:"";
+  if(ld==="plate")s+=`<line class="ld" x1="${(p[8]+1).toFixed(1)}" y1="${(p[9]-17).toFixed(1)}" x2="${(p[8]+11).toFixed(1)}" y2="${(p[9]+11).toFixed(1)}"/>`;
+  else if(ld==="roll")s+=`<circle class="ld" cx="${(p[8]+(t<.5?2:-2)).toFixed(1)}" cy="${(p[9]-3).toFixed(1)}" r="4"/>`;
+  else{s+=load(wx,wy);if(F.mir)s+=load(2*p[2]-wx,wy)}
+  svg.querySelector(".b").innerHTML=s;
+  svg.querySelector(".cb").innerHTML=F.cab?`<line class="cab" x1="${F.cab[0]}" y1="${F.cab[1]}" x2="${wx.toFixed(1)}" y2="${wy.toFixed(1)}"/>`:"";
+  if(F.ghost&&!svg.dataset.g){svg.dataset.g=1;const q=F.A;svg.querySelector(".gh").innerHTML=ln(q[2],q[3],q[10],q[11])+ln(q[10],q[11],q[12],q[13])+ln(q[4],q[5],q[6],q[7])+ln(q[6],q[7],q[8],q[9])}
+}
+const reduceMotion=(()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}})();
+function figLoop(ts){
+  const c=(ts/3200)%1;let t;
+  if(c<.15)t=0;else if(c<.5)t=(1-Math.cos(Math.PI*(c-.15)/.35))/2;else if(c<.65)t=1;else t=(1+Math.cos(Math.PI*(c-.65)/.35))/2;
+  if(reduceMotion)t=1;
+  document.querySelectorAll("#t-workout.on details[open] svg.fig").forEach(s=>drawFig(s,t));
+  requestAnimationFrame(figLoop);
+}
+requestAnimationFrame(figLoop);
 function lastFor(name,before){
   const ds=Object.keys(DB.entries).filter(d=>d<before).sort().reverse();
   for(const d of ds){const l=(DB.entries[d].lifts||[]).find(x=>x.ex===name&&x.sets&&x.sets.length);if(l)return{d,sets:l.sets}}
@@ -567,7 +639,7 @@ function exCard(it,i,date,saved){
    <div class="setrow mute" style="margin-top:2px"><span></span><span>${u==="sec"?"—":"Weight ("+unitLbl(u)+")"}</span><span>${u==="sec"?"Seconds":"Reps"}</span><span></span></div>
    <div class="sets">${rows}</div>
    <div class="exbtns"><button class="ghost small addset">+ Set</button>${last?`<button class="ghost small copy">Same as last</button>`:""}</div>
-   ${e.c&&e.c.length?`<details class="how"><summary>How to do it</summary><ol>${e.c.map(x=>`<li>${x}</li>`).join("")}</ol><a href="${ytLink(it.ex)}" target="_blank" rel="noopener">▶ Watch form videos</a></details>`:`<details class="how"><summary>How to do it</summary><a href="${ytLink(it.ex)}" target="_blank" rel="noopener">▶ Watch form videos</a></details>`}
+   ${e.c&&e.c.length?`<details class="how"${last?"":" open"}><summary>How to do it</summary>${figSVG(it.ex)}<ol>${e.c.map(x=>`<li>${x}</li>`).join("")}</ol><a href="${ytLink(it.ex)}" target="_blank" rel="noopener">▶ Watch form videos</a></details>`:`<details class="how"><summary>How to do it</summary>${figSVG(it.ex)}<a href="${ytLink(it.ex)}" target="_blank" rel="noopener">▶ Watch form videos</a></details>`}
   </div>`;
 }
 function setRow(i,k,u,val,lastv){
