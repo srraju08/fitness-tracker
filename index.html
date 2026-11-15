@@ -239,7 +239,7 @@ details.how ol{margin:6px 0;padding-left:18px}
 const SESSIONS=["Push A","Pull A","Legs A","Recovery","Upper B","Lower B","Rest"];
 const LIFT=new Set(["Push A","Pull A","Legs A","Upper B","Lower B"]);
 const BY_DAY={1:"Push A",2:"Pull A",3:"Legs A",4:"Recovery",5:"Upper B",6:"Lower B",0:"Rest"};
-const CORE_DAY={1:"Core A: plank, dead bug",2:"Core B: cable crunch, reverse crunch",5:"Core C: Pallof press, side plank",6:"Core D: reverse crunch, bird dog, plank"};
+const CORE_DAY={3:"Core: step cross-body climber",1:"Core A: step mountain climber, plank, dead bug",2:"Core B: step plank knee tuck, cable crunch, reverse crunch",5:"Core C: step plank jack, Pallof press, side plank",6:"Core D: reverse crunch, bird dog, plank"};
 const CARDIO={"Push A":"15 min incline walk","Pull A":"15 min cycling","Legs A":"15 min easy cycling","Recovery":"25 min easy walk + 15 min mobility","Upper B":"15 min elliptical or treadmill","Lower B":"15 min easy cycling or walk","Rest":"Optional gentle walk"};
 function phase(w){
   if(w<1)return{n:"Not started",t:"Plan starts on your week-1 date."};
@@ -512,10 +512,10 @@ const EX={
 };
 // [exercise, sets weeks 1–4, sets week 5+]
 const PLAN={
- "Push A":[["Machine chest press",3,4],["Incline dumbbell press",2,3],["Shoulder press machine",2,2],["Dumbbell lateral raise",2,3],["Triceps pushdown",2,2],["Plank",2,2],["Dead bug",2,2]],
- "Pull A":[["Lat pulldown",3,3],["Seated cable row",2,3],["Chest-supported row",2,2],["Face pull",2,2],["Dumbbell biceps curl",2,2],["Cable crunch",2,2],["Reverse crunch",2,2]],
- "Legs A":[["Leg press",3,3],["Goblet squat",2,2],["Leg extension",2,2],["Seated leg curl",2,2],["Calf raise",2,2]],
- "Upper B":[["Incline chest press",2,2],["Lat pulldown",2,2],["Seated cable row",2,2],["Dumbbell lateral raise",2,3],["Biceps curl",2,3],["Triceps pushdown",2,3],["Pallof press",2,2],["Side plank",2,2]],
+ "Push A":[["Machine chest press",3,4],["Incline dumbbell press",2,3],["Shoulder press machine",2,2],["Dumbbell lateral raise",2,3],["Triceps pushdown",2,2],["Step mountain climber",2,3],["Plank",2,2],["Dead bug",2,2]],
+ "Pull A":[["Lat pulldown",3,3],["Seated cable row",2,3],["Chest-supported row",2,2],["Face pull",2,2],["Dumbbell biceps curl",2,2],["Step plank knee tuck",2,3],["Cable crunch",2,2],["Reverse crunch",2,2]],
+ "Legs A":[["Leg press",3,3],["Goblet squat",2,2],["Leg extension",2,2],["Seated leg curl",2,2],["Calf raise",2,2],["Step cross-body climber",2,3]],
+ "Upper B":[["Incline chest press",2,2],["Lat pulldown",2,2],["Seated cable row",2,2],["Dumbbell lateral raise",2,3],["Biceps curl",2,3],["Triceps pushdown",2,3],["Step plank jack",2,3],["Pallof press",2,2],["Side plank",2,2]],
  "Lower B":[["Dumbbell Romanian deadlift",2,2],["Hip thrust",2,2],["Leg press",2,2],["Seated leg curl",2,2],["Calf raise",2,2],["Reverse crunch",2,2],["Bird dog",2,2],["Plank",2,2]],
  "Recovery":[],"Rest":[]
 };
@@ -566,7 +566,13 @@ const FIG={
 const BENCH=L(36,100,112,100)+L(46,100,46,125)+L(102,100,102,125);
 const LIE=(e,w)=>[40,92,50,96,96,98,118,98,122,125].concat(e,w);
 const SEATF=L(84,96,116,96)+L(100,96,100,125);
+const STEP=RC(40,92,28,6)+L(44,98,44,125)+L(64,98,64,125);
+const IP=[50,60,58,64,106,90,132,106,158,120,57,78,56,92];
 const ADD_EX={
+ "Step mountain climber":{r:[20,20],u:"bw",s:"Hands on a step · 20 total reps",core:1,c:["Hands on a step under your shoulders, body in a straight line.","Drive one knee toward your chest, then switch in a running rhythm.","Hips stay level, no bouncing. Lower step or floor = harder."]},
+ "Step cross-body climber":{r:[20,20],u:"bw",s:"Hands on a step · 20 total reps",core:1,c:["Same plank on the step.","Drive the knee across toward the opposite elbow, then switch.","Twist from the trunk; keep shoulders over hands."]},
+ "Step plank knee tuck":{r:[20,20],u:"bw",s:"Hands on a step · 20 reps",core:1,c:["Plank with hands on the step.","Jump both feet in toward the step, knees under hips.","Jump back to a straight plank and land softly."]},
+ "Step plank jack":{r:[20,20],u:"bw",s:"Hands on a step · 20 reps",core:1,c:["Plank with hands on the step, feet together.","Jump feet wide, then back together, like a jumping jack.","Hips stay level; don't let the lower back sag."]},
  "Barbell bench press":{r:[8,12],u:"kg",s:"Empty bar (20 kg) first",c:["Eyes under the bar, feet flat, shoulder blades pinched.","Lower the bar to mid-chest with elbows about 45° from your body.","Press up and slightly back. Use a spotter or safety pins."]},
  "Dumbbell bench press":{r:[10,12],u:"kg/hand",s:"6–8 kg/hand",c:["Lie flat, feet planted, shoulder blades pinched.","Lower dumbbells beside the chest, elbows about 45°.","Press up until arms are straight, dumbbells close but not clanking."]},
  "Push-up":{r:[8,15],u:"bw",s:"Bodyweight",c:["Hands under shoulders, body in one straight line.","Lower until chest is a fist from the floor, elbows about 45°.","Too hard? Use the incline push-up instead."]},
@@ -607,6 +613,10 @@ const ADD_EX={
 };
 Object.assign(EX,ADD_EX);
 Object.assign(FIG,{
+ "Step mountain climber":{A:IP,B:IP,L2A:[132,106,158,120],L2B:[90,96,104,112],t2:[4,5],tA:[4,5],tB:[4,5],pr:STEP},
+ "Step cross-body climber":{A:IP,B:IP,L2A:[132,106,158,120],L2B:[80,88,92,100],t2:[4,5],tA:[4,5],tB:[4,5],pr:STEP},
+ "Step plank knee tuck":{A:IP,B:[50,60,58,64,98,74,118,92,110,122,57,78,56,92],tA:[4,5],tB:[6,3],pr:STEP},
+ "Step plank jack":{A:IP,B:[50,60,58,64,106,88,132,103,158,116,57,78,56,92],L2A:[132,106,158,120],L2B:[128,110,146,122],t2:[4,5],tA:[4,5],tB:[4,5],pr:STEP},
  "Barbell bench press":{A:LIE([56,108],[58,88]),B:LIE([54,74],[56,54]),ld:"bb",pr:BENCH},
  "Dumbbell bench press":{A:LIE([56,108],[58,88]),B:LIE([54,74],[56,54]),ld:"db",pr:BENCH},
  "Skull crusher":{A:LIE([54,74],[56,54]),B:LIE([54,74],[38,78]),ld:"bb",pr:BENCH},
@@ -654,7 +664,7 @@ const GROUPS={
  "Quads":["Leg press","Goblet squat","Leg extension","Smith machine squat","Barbell back squat","Bulgarian split squat","Walking lunge","Step-up"],
  "Hamstrings & glutes":["Dumbbell Romanian deadlift","Barbell Romanian deadlift","Seated leg curl","Lying leg curl","Hip thrust","Glute bridge","Cable kickback","Hip abduction machine"],
  "Calves":["Calf raise","Seated calf raise"],
- "Core":["Plank","Side plank","Dead bug","Bird dog","Pallof press","Cable crunch","Reverse crunch","Crunch","Lying leg raise","Hanging knee raise","Mountain climber","Farmer carry"]
+ "Core":["Step mountain climber","Step cross-body climber","Step plank knee tuck","Step plank jack","Plank","Side plank","Dead bug","Bird dog","Pallof press","Cable crunch","Reverse crunch","Crunch","Lying leg raise","Hanging knee raise","Mountain climber","Farmer carry"]
 };
 const groupOf=n=>Object.keys(GROUPS).find(g=>GROUPS[g].includes(n));
 
@@ -729,7 +739,7 @@ function exCard(it,i,date,saved){
   const n=Math.max(it.target,sv?sv.sets.length:0);
   const top=it.range[1];
   let hint="";
-  if(last&&u!=="sec"&&last.sets.length>=it.target&&last.sets.every(s=>s.r>=top))hint=`Last time you hit ${top} reps on every set → add the smallest weight step today.`;
+  if(last&&u!=="sec"&&last.sets.length>=it.target&&last.sets.every(s=>s.r>=top))hint=u==="bw"?`Hit ${top} reps on every set last time → make it harder: lower step, slower reps, or a few more reps.`:`Last time you hit ${top} reps on every set → add the smallest weight step today.`;
   if(last&&u==="sec"&&last.sets.every(s=>s.r>=top)&&top<60)hint=`Holding ${top}s on every set → add 10 s.`;
   const rangeTxt=it.range[0]===it.range[1]?it.range[0]:it.range[0]+"–"+it.range[1];
   const rows=Array.from({length:n},(_,k)=>setRow(i,k,u,sv&&sv.sets[k],last&&last.sets[k])).join("");
